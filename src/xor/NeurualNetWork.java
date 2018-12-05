@@ -53,25 +53,6 @@ public class NeurualNetWork implements NeuralNetInterface {
     private double mArgA;
     private double mArgB;
 
-
-    //TODO: delete the following previous code
-    private double NeuronCell[][];
-    private double S[][];
-    protected double Weight[][][]; //Weight on every layer
-    private double WeightChange[][][];
-    private double layerError[][];
-
-
-
-    private double WeightSum;
-
-    //for LUT:
-    private double[][] LUTTable;
-    private int LUTHowManyState = 384;
-    private int LUTHowManyAction = 8;
-
-    private double[][] Input;
-
     /**
             * Constructor. (Cannot be declared in an interface, but your implementation will need one)
             * @param argNumInputs The number of inputs in your input vector
@@ -102,77 +83,71 @@ public class NeurualNetWork implements NeuralNetInterface {
         this.mArgA = argA;
         this.mArgB = argB;
 
+        zeroWeights();
         //Comment: It's a bad way to use three dimension to store NN, since input, hidden, output don't have same length
-
-//        NeuronCell = new double[3][];
-//        NeuronCell[0] = new double[argNumInputs+1];
-//        NeuronCell[1] = new double[argNumHidden+1];
-//        NeuronCell[2] = new double[argNumOutput];
-//        //bias term
-//        NeuronCell[0][2] = 1;
-//        S = new double[3][];
-//        S[0] = new double[argNumInputs+1];
-//        S[1] = new double[argNumHidden+1];
-//        S[2] = new double[argNumOutput];
-//        S[0][2] = 1;
-//        layerError=new double[3][];
-//        layerError[0]=new double[argNumInputs+1];
-//        layerError[1]=new double[argNumHidden+1];
-//        layerError[2]=new double[argNumOutput];
-//        Weight=new double[2][][];
-//        Weight[0]=new double[argNumInputs+1][argNumHidden];
-//        //don't need weight to bias term in next layer
-//        Weight[1]=new double[argNumHidden+1][argNumOutput];
-//        WeightChange=new double[2][][];
-//        WeightChange[0]=new double[argNumInputs+1][argNumHidden];
-//        WeightChange[1]=new double[argNumHidden+1][argNumOutput];
-//        WeightSum=0;
     }
 
 
-    public void buildLUT(int totalStates, int totalActions){
-        LUTTable = new double[totalStates][totalActions];
-    }
+//    public void buildLUT(int totalStates, int totalActions){
+//        LUTTable = new double[totalStates][totalActions];
+//    }
 
-    public void readLUT(String argFileName) throws IOException {
-        //Action1.csv;
-        //duplicate function, delete it later
-        loadLUT(argFileName);
-    }
-
-    public void setInputs() {
-
-        Input = new double[3072][4];
-
-        for(int state=0;state<3072;++state) {
-            Input[state][0] = (double)state % 2*2-1;
-            Input[state][1] = ((   Math.floor(((double)state / 2)) % 8 )     / (8 - 1))*2-1;
-            Input[state][2] = ((    Math.floor(((double)state / 2 / 3)) %  3)     / (3 - 1))*2-1;
-            Input[state][3] = ((    Math.floor(((double)state / 2 / 8 / 3)) % 8 )    / (8 - 1))*2-1;
-            //Input[state][4] = ((    Math.floor(((double)state / 2 / 53 / 8 / 3)) % 8)     / (8 - 1))*2-1;}
-
-        }
-    }
+//    public void readLUT(String argFileName) throws IOException {
+//        //Action1.csv;
+//        //duplicate function, delete it later
+//        loadLUT(argFileName);
+//    }
+//
+//    public void setInputs() {
+//
+//        Input = new double[3072][4];
+//
+//        for(int state=0;state<3072;++state) {
+//            Input[state][0] = (double)state % 2*2-1;
+//            Input[state][1] = ((   Math.floor(((double)state / 2)) % 8 )     / (8 - 1))*2-1;
+//            Input[state][2] = ((    Math.floor(((double)state / 2 / 3)) %  3)     / (3 - 1))*2-1;
+//            Input[state][3] = ((    Math.floor(((double)state / 2 / 8 / 3)) % 8 )    / (8 - 1))*2-1;
+//            //Input[state][4] = ((    Math.floor(((double)state / 2 / 53 / 8 / 3)) % 8)     / (8 - 1))*2-1;}
+//
+//        }
+//    }
 
     @Override
     /**
      * Return a bipolar sigmoid of the input X
      * @param x The input
-     * @return f(x) = 2 / (1+e(-x)) - 1
+     * @return f(x) = 1 / (1+e(-x))
      */
     public double sigmoid(double x) {
         return 1/(1+Math.exp(-x));
+    }
+
+    /**
+     * This method implements the derivative of the sigmoid function
+     * @param x The input
+     * @return f'(x) = (1 / (1 + exp(-x)))(1 - (1 / (1 + exp(-x))))
+     */
+    public double derivativeSigmoid(double x){
+        return sigmoid(x) * (1 - sigmoid(x));
     }
 
     @Override
     /**
      * This method implements a general sigmoid with asymptotes bounded by (a,b)
      * @param x The input
-     * @return f(x) = b_minus_a / (1 + e(-x)) - minus_a
+     * @return f(x) = （b-a） / (1 + e(-x)) - （-a）
      */
-    // may not need this here
     public double customSigmoid(double x) {
-        return (2.0/(1+Math.exp(-x)) - 1.0);
+        return ((mArgB-mArgA)/(1+Math.exp(-x)) + mArgA);
+    }
+
+    /**
+     * This method implements the derivative of the custom sigmoid
+     * @param x The input
+     * @return f'(x) = (1 / (b - a))(customSigmoid(x) - a)(b - customSigmoid(x))
+     */
+    public double derivativeCustomSigmoid(double x){
+        return (1.0/(mArgB - mArgA)) * (customSigmoid(x) - mArgA) * (mArgB - customSigmoid(x));
     }
 
     @Override
@@ -186,19 +161,32 @@ public class NeurualNetWork implements NeuralNetInterface {
     public void initializeWeights() {
         Random random = new Random();
         //weight from input x[i] to hidden layer h[j]
-        for(int i=0;i<argNumInputs;i++){
-            //i<=argNumInputs for bias?
-            for(int j=0;j<argNumHidden;j++){
-                Weight[0][i][j]=random.nextDouble() + argA;
-                //random value from -0.5 to 0.5
+        int i, j;
+
+        // initialize input-hidden neuron weights
+        for(i = 0; i < mNumInputs; i++)
+        {
+            for(j = 0; j < mNumHidden; j++)
+            {
+                //ranging from -0.5 to 0.5
+                mInputHiddenWeights[i][j] = random.nextDouble() - 0.5;
             }
         }
 
-        for(int i=0;i<argNumHidden;i++){
-            for(int j = 0; j< argNumOutputs; ++j){
-                Weight[1][i][j]=random.nextDouble() + argA;
+        // initialize hidden-output neuron weights
+        for(i = 0; i < mNumHidden; i++)
+        {
+            for(j = 0; j < mNumOutputs; j++)
+            {
+                // initialize the output neuron weights
+                mHiddenOutputWeights[i][j] = random.nextDouble() - 0.5;
             }
         }
+
+        // Copy the initial weights into the delta tracking variables
+        mPreviousInputHiddenWeights = mInputHiddenWeights.clone();
+        mPreviousHiddenOutputWeights = mHiddenOutputWeights.clone();
+
     }
 
     @Override
@@ -206,16 +194,18 @@ public class NeurualNetWork implements NeuralNetInterface {
      * Initialize the weights to 0.
      */
     public void zeroWeights() {
-        for(int i=0;i<=argNumInputs;i++){
-            //i<=argNumInputs for bias?
-            for(int j=0;j<=argNumHidden;j++){
-                Weight[0][i][j] = 0;
+        int i, j;
+        for(i = 0;i < mNumInputs;i++){
+            for(j = 0;j < mNumHidden;j++){
+                mInputHiddenWeights[i][j] = 0.0;
+                mPreviousInputHiddenWeights[i][j] = 0.0;
             }
         }
 
-        for(int i=0;i<=argNumHidden;i++){
-            for(int j = 0; j< argNumOutputs; ++j){
-                Weight[1][i][j] = 0;
+        for(i = 0;i < mNumHidden;i++){
+            for(j = 0; j< mNumOutputs; ++j){
+                mHiddenOutputWeights[i][j] = 0.0;
+                mPreviousHiddenOutputWeights[i][j] = 0.0;
             }
         }
     }
