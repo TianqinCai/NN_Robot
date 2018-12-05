@@ -48,6 +48,9 @@ public class NeurualNetWork implements NeuralNetInterface {
     private double[] mOutputValues = new double[MAX_OUTPUT_NEURONS];
     // variable for out neuron error
     private double[] mOutputNeuronErrors = new double[MAX_OUTPUT_NEURONS];
+    // array to store unactivated values
+    private double[] mHiddenUnactivatedValue = new double[MAX_HIDDEN_NEURONS];
+    private double[] mOutputUnactivatedValue = new double[MAX_OUTPUT_NEURONS];
 
     //private member variables
     private double mArgA;
@@ -87,30 +90,6 @@ public class NeurualNetWork implements NeuralNetInterface {
         //Comment: It's a bad way to use three dimension to store NN, since input, hidden, output don't have same length
     }
 
-
-//    public void buildLUT(int totalStates, int totalActions){
-//        LUTTable = new double[totalStates][totalActions];
-//    }
-
-//    public void readLUT(String argFileName) throws IOException {
-//        //Action1.csv;
-//        //duplicate function, delete it later
-//        loadLUT(argFileName);
-//    }
-//
-//    public void setInputs() {
-//
-//        Input = new double[3072][4];
-//
-//        for(int state=0;state<3072;++state) {
-//            Input[state][0] = (double)state % 2*2-1;
-//            Input[state][1] = ((   Math.floor(((double)state / 2)) % 8 )     / (8 - 1))*2-1;
-//            Input[state][2] = ((    Math.floor(((double)state / 2 / 3)) %  3)     / (3 - 1))*2-1;
-//            Input[state][3] = ((    Math.floor(((double)state / 2 / 8 / 3)) % 8 )    / (8 - 1))*2-1;
-//            //Input[state][4] = ((    Math.floor(((double)state / 2 / 53 / 8 / 3)) % 8)     / (8 - 1))*2-1;}
-//
-//        }
-//    }
 
     @Override
     /**
@@ -252,44 +231,59 @@ public class NeurualNetWork implements NeuralNetInterface {
      * @param X The input vector. An array of doubles.
      * @return The value returned by th LUT or NN for this input vector
      */
+    public double[] outputFor(double[] X){
+        int h, o, i, index;
+        //set bias term
+        //TODO: bias term for hidden forgotten
+        mInputValues[0] = 1.0;
 
-    public double outputFor(double[] X) {
-        //step forward
-        //first get initial input
-        int i = 0, j = 0;
-        for(i=0;i<argNumInputs;i++){
-            S[0][i] = X[i];
-            NeuronCell[0][i] = X[i];
+        //set input values
+        for(index = 0; index < X.length; index++){
+            mInputValues[index+1] = X[index];
         }
-        //then add the bias term
-        S[0][argNumInputs] = 1;
-        NeuronCell[0][argNumInputs] = customSigmoid(S[0][argNumInputs]);
-        S[1][argNumHidden] = 1;
-        NeuronCell[1][argNumHidden] = customSigmoid(S[1][argNumInputs]);
 
-        for(i=0;i<argNumHidden;i++){
-            for(j=0;j<=argNumInputs;j++){
-                //Wji : weigth from j to i
-                WeightSum+=NeuronCell[0][j]*Weight[0][j][i];
+        //step forward and calculate hidden values
+        //TODO: initialize unactivated to zero first
+        for(h = 0; h < mNumHidden; h++){
+            for( i = 0; i < mNumInputs; i++){
+                mHiddenUnactivatedValue[h] += mInputValues[i]*mInputHiddenWeights[i][h];
             }
-            //Sj = sigma(Wji * Xi)
-            S[1][i]=WeightSum;
-            NeuronCell[1][i]=(customSigmoid(WeightSum));
-            //reset weigthsum
-            WeightSum=0;
+            //TODO: use unActivatedHiddenNeuronValues to store S before activation function: y=f(s), so that we can put it into derivative function
+            // right now simply use y' = y(1-y) and not use S array to store intermediate result
+            mHiddenNeuronValues[h] = customSigmoid(mHiddenUnactivatedValue[h]);
         }
 
-        for(i = 0; i < argNumOutputs; i++){
-            for(j = 0;j <= argNumHidden;j++){
-                WeightSum += NeuronCell[1][j] * Weight[1][j][i];
+        //Step forward and Calculate the output for the output neurons
+        //TODO: initialize unactivated to zero first
+        for(o = 0; o < mNumOutputs; o++){
+            for(h = 0; h < mNumHidden; h++){
+                mOutputUnactivatedValue[o] += mHiddenNeuronValues[h] * mHiddenOutputWeights[h][o];
             }
-            NeuronCell[2][i]=customSigmoid(WeightSum);
-            S[2][i]=WeightSum;
-            WeightSum=0;
+            mOutputValues[o] = customSigmoid(mOutputUnactivatedValue[o]);
         }
-        //if we only return 1 double, it means we only have one output, so actually we can write return NeuronCell[2][0]
-        return NeuronCell[2][0];
+
+        return mOutputValues.clone();
     }
+
+    private void calculateErrors(double[] expectedOutputs){
+        int h, o, index;
+        double sumError;
+
+        //TODO: different: put hidden errors outside outputerror loop
+        for(o = 0; o < mNumOutputs; o++){
+            mOutputNeuronErrors[o] = (expectedOutputs[o] - mOutputValues[o]) * derivativeCustomSigmoid(mOutputUnactivatedValue[o]);
+        }
+
+        // calculate error signal for hidden unit
+        for(h = 0; h < mNumHidden; h++){
+            sumError = 0.0;
+            for(index = 0; index < mNumOutputs; index++) {
+                sumError += mOutputNeuronErrors[index] * mHiddenOutputWeights[h][index];
+            }
+            mHiddenNeuronErrors[h] = sumError * derivativeCustomSigmoid(mHiddenUnactivatedValue[h]);
+        }
+    }
+
 
     @Override
     /**
