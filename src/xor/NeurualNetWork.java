@@ -354,8 +354,24 @@ public class NeurualNetWork implements NeuralNetInterface {
         return NNWeights;
     }
 
-    public void setWeights(){
-        
+    public void setWeights(List<List<List<Double>>> weights){
+        int i, h, o;
+
+        for(h = 0; h < mNumHidden; h++){
+            for( i = 0; i < mNumInputs; i++){
+                mInputHiddenWeights[i][h] = weights.get(WEIGHTS_INPUT_HIDDEN_INDEX).get(h).get(i);
+            }
+        }
+
+        for( o = 0; o < mNumOutputs; o++){
+            for(h = 0; h < mNumHidden; h++){
+                mHiddenOutputWeights[h][o] = weights.get(WEIGTHS_HIDDEN_OUTPUT_INDEX).get(o).get(h);
+            }
+        }
+
+        mPreviousInputHiddenWeights = mInputHiddenWeights.clone();
+        mPreviousHiddenOutputWeights = mHiddenOutputWeights.clone();
+
     }
 
 
@@ -404,18 +420,18 @@ public class NeurualNetWork implements NeuralNetInterface {
     }
 
     public void loadLUT(String argFileName) throws IOException{
-        FileInputStream fileInputStream;
-        try {
-            fileInputStream = new FileInputStream(argFileName);
-            Scanner inputScanner = new Scanner(fileInputStream);
-            for (int i = 0; i < LUTHowManyState; i++) {
-                for (int j = 0; j < LUTHowManyAction; j++) {
-                    LUTTable[i][j] = customSigmoid(inputScanner.nextDouble());
-                }
-            }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+//        FileInputStream fileInputStream;
+//        try {
+//            fileInputStream = new FileInputStream(argFileName);
+//            Scanner inputScanner = new Scanner(fileInputStream);
+//            for (int i = 0; i < LUTHowManyState; i++) {
+//                for (int j = 0; j < LUTHowManyAction; j++) {
+//                    LUTTable[i][j] = customSigmoid(inputScanner.nextDouble());
+//                }
+//            }
+//        } catch (FileNotFoundException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 }
