@@ -210,6 +210,43 @@ public class NeurualNetWork implements NeuralNetInterface {
         }
     }
 
+    private double calculateWeightDelta(double weightInput, double error, double currentWeight, double previousWeight){
+        double momentum, learningTerm;
+        momentum = mMomentumTerm * (currentWeight - previousWeight);
+        learningTerm = mLearningRate * error * weightInput;
+        return learningTerm + momentum;
+    }
+
+    private void updateWeight(){
+        int h, o, i;
+        double[][] newHiddenOutputWeights = new double[MAX_HIDDEN_NEURONS][MAX_OUTPUT_NEURONS];
+        double[][] newInputHiddenWeights = new double[MAX_INPUT_NEURONS][MAX_HIDDEN_NEURONS];
+
+        for(o = 0; o < mNumOutputs; o++){
+            for(h = 0; h < mNumHidden; h++){
+                newHiddenOutputWeights[h][o] = mHiddenOutputWeights[h][o] +
+                        calculateWeightDelta(
+                                mHiddenNeuronValues[h],
+                                mOutputNeuronErrors[o],
+                                mHiddenOutputWeights[h][o],
+                                mPreviousHiddenOutputWeights[h][o]);
+            }
+        }
+
+        for(h = 0; h < mNumHidden; h++){
+            for(i = 0; i < mNumInputs; i++){
+                newInputHiddenWeights[i][h] = mInputHiddenWeights[i][h] +
+                        calculateWeightDelta(
+                                mInputValues[i],
+                                mHiddenNeuronErrors[i],
+                                mInputHiddenWeights[i][h],
+                                mPreviousInputHiddenWeights[i][h]);
+            }
+        }
+
+
+    }
+
     @Override
     /**
      * @param X The input vector. An array of doubles.
