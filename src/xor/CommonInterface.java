@@ -2,6 +2,7 @@ package xor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public interface CommonInterface {
     /**
@@ -18,7 +19,7 @@ public interface CommonInterface {
      * @param argValue The new value to learn
      * @return The error in the output for that input vector
      */
-    public double train(double [] X, double argValue);
+    public double[] train(List<List<Double>> trainingSet);
 
     /**
      * A method to write either a LUT or weights of an neural net to a file.

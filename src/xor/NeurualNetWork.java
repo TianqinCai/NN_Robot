@@ -1,6 +1,8 @@
 package xor;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -294,62 +296,68 @@ public class NeurualNetWork implements NeuralNetInterface {
      * @param argValue The new value to learn
      * @return The error in the output for that input vector
      */
-    public double train(double[] X, double argValue) {
+    public double[] train(List<List<Double>> trainingSet) {
 
-        outputFor(X);
+        double[] errors = new double[mNumOutputs];
+        double[] inputs = new double[trainingSet.get(TRAINING_SET_STATE_INDEX).size()];
+        double[] outputs = new double[trainingSet.get(TRAINING_SET_ACTION_INDEX).size()];
+        int i;
 
-        // for output unit
-        // Ei = (Ci - yi)*yi*(1-yi)
-        for(int i=0;i<argNumOutputs;i++){
-            for(int j=0;j<argNumHidden;++j){
-                //layerError[2][i] = (argValue-NeuronCell[2][i])*NeuronCell[2][i]*(1-NeuronCell[2][i]);
-                layerError[2][i] = (argValue-NeuronCell[2][i])*0.5*(1-NeuronCell[2][i]*NeuronCell[2][i]);
-            }
+        //get the inputs and outputs from trainingSet
+        for(i = 0; i < inputs.length; i++){
+            inputs[i] = trainingSet.get(TRAINING_SET_STATE_INDEX).get(i);
+        }
+        for(i = 0; i < outputs.length; i++){
+            outputs[i] = trainingSet.get(TRAINING_SET_ACTION_INDEX).get(i);
         }
 
-        // for hidden unit
-        // Ei = Sigma{Whi * Eh * yi * (1-yi)}
-        for(int h = 0; h < argNumOutputs; h++) {
-            for (int i = 0; i < argNumHidden; i++) {
-                //layerError[1][i] = Weight[1][i][h] * layerError[2][h] * NeuronCell[1][i] * (1 - NeuronCell[1][i]);
-                layerError[1][i] = Weight[1][i][h] * layerError[2][h] * 0.5 *  (1 - NeuronCell[1][i]* NeuronCell[1][i]);
-            }
+        outputFor(inputs);
+
+        calculateErrors(outputs);
+
+        updateWeight();
+
+        for(i = 0; i < mNumOutputs; i++){
+            errors[i] = outputs[i] - mOutputValues[i];
         }
 
-        //Ej = Yj * (1-Yj) * Sigma(Eh * Whj)
-        //We first calculate Sigma(Eh * Whj) term and store it into temp
-        double temp=0;
-        for(int h = 0; h < argNumOutputs; h++) {
-            for (int j = 0; j < argNumHidden; j++) {
-                temp += Weight[0][2][j] * layerError[1][j];
-            }
-        }
-        //layerError[0][2]=temp*(1-NeuronCell[0][2])*NeuronCell[0][2];
-        layerError[0][2]=temp*0.5*(1-NeuronCell[0][2]*NeuronCell[0][2]);
-
-        //now we need to change the weight: Wji* = Wji + (Learning Rate)*(Layer Error)*(Xi)
-        double Wji_With_Momentum=0;
-        ///wight change
-        for(int j=0;j<1;j++) {
-            for (int i = 0; i <= argNumHidden; i++) {
-                //Wji*
-                Wji_With_Momentum = Weight[1][i][j] + argMomentumTerm * WeightChange[1][i][j] + argLearningRate * layerError[2][j] * NeuronCell[1][i];
-                WeightChange[1][i][j] = Wji_With_Momentum - Weight[1][i][j];
-                Weight[1][i][j] = Wji_With_Momentum;
-            }
-        }
-
-        for(int i=0;i<=argNumInputs;i++){
-            for(int j=0;j<argNumHidden;j++){
-                Wji_With_Momentum=Weight[0][i][j]+argMomentumTerm*WeightChange[0][i][j]+argLearningRate*layerError[1][j]*NeuronCell[0][i];
-                WeightChange[0][i][j]=Wji_With_Momentum-Weight[0][i][j];
-                Weight[0][i][j]=Wji_With_Momentum;
-
-            }
-        }
-        double error = 0.5 * Math.pow(NeuronCell[2][0]-argValue, 2);
-        return error;
+        return errors;
     }
+
+    public List<List<List<Double>>> getWeights(){
+        List<List<List<Double>>> NNWeights = new ArrayList<>();
+        List<List<Double>> inputHiddenWeights = new ArrayList<>();
+        List<List<Double>> hiddenOutputWeights = new ArrayList<>();
+        List<Double> subset;
+        int i, h, o;
+
+        for(h = 0; h < mNumHidden; h++){
+            subset = new ArrayList<>();
+            for(i = 0; i < mNumInputs; i++){
+                subset.add(mInputHiddenWeights[i][h]);
+            }
+            inputHiddenWeights.add(subset);
+        }
+        NNWeights.add(inputHiddenWeights);
+
+        //TODO: different: bias for hidden output weight
+        for(o = 0; o < mNumOutputs; o++){
+            subset = new ArrayList<>();
+            for(h = 0; h < mNumHidden; h++){
+                subset.add(mHiddenOutputWeights[h][o]);
+            }
+            hiddenOutputWeights.add(subset);
+        }
+
+        NNWeights.add(hiddenOutputWeights);
+
+        return NNWeights;
+    }
+
+    public void setWeights(){
+        
+    }
+
 
     @Override
     /**
