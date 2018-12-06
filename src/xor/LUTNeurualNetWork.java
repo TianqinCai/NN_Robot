@@ -135,7 +135,7 @@ public class LUTNeurualNetWork extends NeurualNetWork {
                             input[2] = s3;
                             input[3] = s4;
                             input[4] = a;
-                            totalError+=train(input, LUTTable[s1][s2][s3][s4][a]);
+                            //totalError+=train(input, LUTTable[s1][s2][s3][s4][a]);
                         }
                     }
                 }
@@ -149,15 +149,15 @@ public class LUTNeurualNetWork extends NeurualNetWork {
         try {
             //TODO: find a way to store the weights
             BufferedWriter out3 = new BufferedWriter(new FileWriter(NNWeights));
-            for(int i = 0; i < Weight.length; i++) {
-                for(int j = 0; j < Weight[0].length; j++) {
-                    for(int k = 0; k < Weight[0][0].length;k++) {
-//                        System.out.println(i+" " + j + " " + k + " ");
-//                        System.out.println(Weight[i][j][k]);
-                        out3.write(String.valueOf(Weight[i][j][k])+" ");
-                    }
-                }
-            }
+//            for(int i = 0; i < Weight.length; i++) {
+//                for(int j = 0; j < Weight[0].length; j++) {
+//                    for(int k = 0; k < Weight[0][0].length;k++) {
+////                        System.out.println(i+" " + j + " " + k + " ");
+////                        System.out.println(Weight[i][j][k]);
+//                        out3.write(String.valueOf(Weight[i][j][k])+" ");
+//                    }
+//                }
+//            }
             out3.close();
         } catch (IOException e) {
             e.printStackTrace();
