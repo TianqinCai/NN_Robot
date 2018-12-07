@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b3a67510-3aef-4c8a-8964-1cc060d39f21" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/xor/LUTNeurualNetWork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xor/LUTNeurualNetWork.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PROJECT1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/PROJECT1.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/convergence.csv" beforeDir="false" afterPath="$PROJECT_DIR$/convergence.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PROJECT1/NeuralNetWork/NeurualNetWork.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/PROJECT1/NeuralNetWork/NeurualNetWork.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PROJECT1/NeuralNetWork/TestBench.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/PROJECT1/NeuralNetWork/TestBench.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MettaBots/MettaNN.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NeuralNetWork/TestBench.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/NeuralNetWork/TestBench.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,11 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/xor/main.java">
+      <file leaf-file-name="NeurualNetWork.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/xor/NeurualNetWork.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1340">
-              <caret line="67" column="34" selection-start-line="67" selection-start-column="34" selection-end-line="67" selection-end-column="34" />
+            <state relative-caret-position="76">
+              <caret line="398" column="59" selection-start-line="398" selection-start-column="59" selection-end-line="398" selection-end-column="59" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -26,14 +33,16 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NeurualNetWork.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/xor/NeurualNetWork.java">
+      <file leaf-file-name="LUT.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/RflRobot/LUT.java">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file leaf-file-name="RFLROBOCODE.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="756">
-              <caret line="432" column="48" selection-start-line="432" selection-start-column="48" selection-end-line="432" selection-end-column="48" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="204">
+              <caret line="54" column="8" selection-start-line="54" selection-start-column="8" selection-end-line="54" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -41,17 +50,17 @@
       <file leaf-file-name="NeurualNetWork.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="354" column="35" selection-start-line="354" selection-start-column="11" selection-end-line="354" selection-end-column="35" />
+            <state relative-caret-position="80">
+              <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestBench.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="TestBench.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/NeuralNetWork/TestBench.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="429">
-              <caret line="44" column="71" selection-start-line="44" selection-start-column="71" selection-end-line="44" selection-end-column="71" />
+            <state relative-caret-position="342">
+              <caret line="44" column="34" selection-start-line="44" selection-start-column="34" selection-end-line="44" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -144,8 +153,10 @@
         <option value="$PROJECT_DIR$/src/xor/NeurualNetWork.java" />
         <option value="$PROJECT_DIR$/src/NeuralNetWork/CommonInterface.java" />
         <option value="$PROJECT_DIR$/src/xor/LUTNeurualNetWork.java" />
-        <option value="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" />
+        <option value="$PROJECT_DIR$/src/MettaBots/MettaNN.java" />
         <option value="$PROJECT_DIR$/src/NeuralNetWork/TestBench.java" />
+        <option value="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" />
+        <option value="$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java" />
       </list>
     </option>
   </component>
@@ -170,7 +181,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -187,19 +197,18 @@
               <item name="NN_Robot" type="b2602c69:ProjectViewProjectNode" />
               <item name="NN_Robot" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="NeuralNetWork" type="462c0819:PsiDirectoryNode" />
+              <item name="RflRobot" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="NN_Robot" type="b2602c69:ProjectViewProjectNode" />
-              <item name="NN_Robot" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="xor" type="462c0819:PsiDirectoryNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -210,7 +219,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="create.test.in.the.same.root" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../UBC-EECE-592-Coursework-master" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../RoboCode/libs/robocode.jar!/" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Modules" />
@@ -219,7 +228,11 @@
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="MettaBots" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="G:\2018UBC_winter\CPEN502\NN_Robot\src" />
       <recent name="G:\2018UBC_winter\CPEN502\NN_Robot\src\NeuralNetWork" />
       <recent name="G:\2018UBC_winter\CPEN502\NN_Robot\src\xor" />
     </key>
@@ -339,7 +352,8 @@
       <workItem from="1543536003891" duration="16821000" />
       <workItem from="1543883754472" duration="640000" />
       <workItem from="1543984377777" duration="24031000" />
-      <workItem from="1544123853451" duration="850000" />
+      <workItem from="1544123853451" duration="1846000" />
+      <workItem from="1544143440345" duration="2140000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <created>1543987085144</created>
@@ -359,7 +373,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="88703000" />
+    <option name="totallyTimeSpent" value="91839000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1359" y="-7" width="1753" height="954" extended-state="6" />
@@ -367,18 +381,19 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.3293979" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.3293979" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.29634002" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.29634002" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24036802" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24036802" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -392,7 +407,6 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
-      <window_info anchor="bottom" id="Messages" order="7" weight="0.3293979" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -412,33 +426,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/output.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/xor/BuildNeuronNetwork.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5580">
-          <caret line="279" column="36" selection-start-line="279" selection-start-column="36" selection-end-line="279" selection-end-column="36" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/xor/main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="740">
-          <caret line="37" column="26" selection-start-line="37" selection-start-column="26" selection-end-line="37" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/xor/CommonInterface.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="700">
@@ -738,30 +725,47 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/xor/NeurualNetWork.java">
+    <entry file="file://$PROJECT_DIR$/src/MettaBots/MettaNN.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="756">
-          <caret line="432" column="48" selection-start-line="432" selection-start-column="48" selection-end-line="432" selection-end-column="48" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="354" column="35" selection-start-line="354" selection-start-column="11" selection-end-line="354" selection-end-column="35" />
+        <state relative-caret-position="20">
+          <caret line="17" column="29" selection-start-line="17" selection-start-column="29" selection-end-line="17" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/NeuralNetWork/TestBench.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="44" column="71" selection-start-line="44" selection-start-column="71" selection-end-line="44" selection-end-column="71" />
+        <state relative-caret-position="342">
+          <caret line="44" column="34" selection-start-line="44" selection-start-column="34" selection-end-line="44" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/xor/NeurualNetWork.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="398" column="59" selection-start-line="398" selection-start-column="59" selection-end-line="398" selection-end-column="59" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/RflRobot/LUT.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="54" column="8" selection-start-line="54" selection-start-column="8" selection-end-line="54" selection-end-column="8" />
         </state>
       </provider>
     </entry>
@@ -822,7 +826,6 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
-                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>

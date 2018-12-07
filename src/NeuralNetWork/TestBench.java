@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class TestBench {
-    private static final int MAXIMUM_EPOCHS = 5000;
+    private static final int MAXIMUM_EPOCHS = 3000;
     private static final double CONVERGENCE_ERROR = 0.1;
     private static final int NUM_INPUTS = 4;
     private static final int NUM_HIDDEN_NEURONS = 100;
@@ -42,7 +42,7 @@ public class TestBench {
         runTrials(NNObject, totalTrainingSet, CONVERGENCE_ERROR, MAXIMUM_EPOCHS, results);
         try {
             printTrialResults(results, "convergence.csv");
-            List<List<List<Double>>> weightLog = NNObject.getWeights();
+            NNObject.saveWeight();
             System.out.println("Finished");
         } catch (IOException e) {
             e.printStackTrace();

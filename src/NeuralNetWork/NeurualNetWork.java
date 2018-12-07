@@ -1,9 +1,6 @@
 package NeuralNetWork;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -424,16 +421,41 @@ public class NeurualNetWork implements NeuralNetInterface {
 
     }
 
-    public void saveWeight(File argFile) {
-        File output = new File("Weights.txt");
+    public void saveWeight() {
+        File output = new File("Weights.data");
         try {
             boolean createNewFile = output.createNewFile();
             BufferedWriter out = new BufferedWriter(new FileWriter(output));
+            FileOutputStream fileOutputStream = new FileOutputStream(output);
+            ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
+            List<List<List<Double>>> weights = getWeights();
+
+            outputStream.writeObject(weights);
+
+            outputStream.flush();
+            outputStream.close();
+
+
             //ToDO:put the weight into the output file
         } catch (IOException e){
             System.out.println("IOException");
         }
+    }
 
+    public void loadWeight(File weightFile){
+        try
+        {
+            FileInputStream fileIn = new FileInputStream(weightFile);
+            ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(fileIn));
+            List<List<List<Double>>> mNeuralNetWeights = (List<List<List<Double>>>) in.readObject();
+            setWeights(mNeuralNetWeights);
+            in.close();
+            fileIn.close();
+        }
+        catch (IOException | ClassNotFoundException exception)
+        {
+            exception.printStackTrace();
+        }
     }
 
     @Override
