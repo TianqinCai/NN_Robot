@@ -3,13 +3,15 @@ package RflRobot;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
 import NeuralNetWork.NeurualNetWork;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 /**
  *
  * @author kl
@@ -20,27 +22,76 @@ import robocode.AdvancedRobot;
 
 public class RFLROBOCODE extends AdvancedRobot {
 	public static final double PI = Math.PI;
-	public int filecounter = 1;
 
-	File winFile;
-	File lutFile1;
+    // Learning constants
+    private static final int NO_LEARNING_RANDOM = 0; // No learning, completely random, baselines behaviour
+    private static final int NO_LEARNING_GREEDY = 1; // No learning, will pick greediest move if LUT is available
+    private static final int SARSA = 2; // On-policy SARSA
+    private static final int Q_LEARNING = 3; // Off-policy Q-learning
+
+    private static final int STATE_DIMENSIONALITY = 4;
+    //NeuralNetwork parameters
+    private static final int NUM_INPUTS = 4; //number of NN inputs
+    private static final int NUM_HIDDENS = 100;
+    private static final int NUM_OUTPUTS = 8;
+    private static final double MIN_VAL = -0.5;
+    private static final double MAX_VAL = 0.5;
+    private static final double MOMENTUM = 0.1;
+    private static final double LEARNING_RATE = 0.0005;
+
+    // Reinforcement learning parameters
+    private static final double ALPHA = 0.7;    // Fraction of difference used
+    private static final double GAMMA = 0.95;    // Discount factor
+    private static final double EPSILON = 0.1;  // Probability of exploration
+
+    private int mCurrentLearningPolicy = SARSA;
+    //private int mCurrentLearningPolicy = NO_LEARNING_RANDOM;
+    //private int mCurrentLearningPolicy = NO_LEARNING_GREEDY;
+    //private int mCurrentLearningPolicy = Q_LEARNING;
+    private boolean mIntermediateRewards = true;
+    private boolean mTerminalRewards = true;
+    private static final int REWARD_SCALER = 150; // How much to scale the rewards by for the neural network calculation
+
+    private static final int ACTION_DIMENSIONALITY = 8;
+
+    private static final int ACTION_MODE_MAX_Q = 0;
+    private static final int ACTION_MODE_EPSILON_GREEDY = 1;
+
+    private int mCurrentAction;
+    private int mPreviousAction;
+    private double [] mCurrentStateSnapshot = new double[STATE_DIMENSIONALITY];
+    private double [] mPreviousStateSnapshot = new double[STATE_DIMENSIONALITY];
+
+    // Winrate tracking for every 100 rounds
+    private static final int NUM_ROUNDS = 10000;
+    private static final int NUM_ROUNDS_DIV_100 = NUM_ROUNDS / 100;
+    private static int [] mNumWinArray = new int[NUM_ROUNDS_DIV_100];
+    private static double [] mAverageDeltaQ = new double[NUM_ROUNDS];
+    private static double [] mHighestDeltaQ = new double[NUM_ROUNDS];
+    private static double [] mLowestDeltaQ = new double[NUM_ROUNDS];
+    private static double [][] mAverageBackpropErrors = new double[NUM_ROUNDS][NUM_OUTPUTS];
+    private static double mRoundTotalDeltaQ;
+    private static double mRoundHighestDeltaQ = -500.0;
+    private static double mRoundLowestDeltaQ = 500.0;
+    private static int mRoundDeltaQNum = 1;
+
+    private double mPreviousEnergyDifference;
+    private double mCurrentEnergyDifference;
+    private double mCurrentReward;
+
+    private static NeurualNetWork mNeuralNet;
+
+	private File mWRFile;
+	private File mLUTFile;
+	private File mWeightFile;
+
 	private TargetInfo target;
 	private RLearning table;
+	//TODO: replace reinforcement with mCurrentReward
 	private double reinforcement = 0.0;
 	private double firePower;
 	private int isAiming = 0;
 
-	// LUT lut=new LUT();
-	// File file = new File(path);
-	/**
-	 * @param args
-	 *            the command line arguments
-	 */
-
-	// public static void main(String[] args) {
-	// TODO code application logic here
-
-	// }
 	public RFLROBOCODE() {
 		table = new RLearning();
 
@@ -49,113 +100,253 @@ public class RFLROBOCODE extends AdvancedRobot {
 	public void run() {
 
 		// loadData();
-		winFile = getDataFile("win_ratio.txt");
-		lutFile1=getDataFile("Action1.csv");
+		mWRFile = getDataFile("win_ratio.txt");
+		mLUTFile =getDataFile("Action1.csv");
+		mWeightFile = getDataFile("weight.data");
 
-		
-		target = new TargetInfo();
+        mNeuralNet = new NeurualNetWork(NUM_INPUTS, NUM_OUTPUTS, NUM_HIDDENS, LEARNING_RATE, MOMENTUM, MIN_VAL, MAX_VAL);
+        //TODO: using getDataFile to load weight may cause problem
+        mNeuralNet.loadWeight(mWeightFile);
+        target = new TargetInfo();
 		target.distance = 100000;
 
+        // Set robot properties
 		setColors(Color.green, Color.white, Color.green);
 		setAdjustGunForRobotTurn(true);
 		setAdjustRadarForGunTurn(true);
+
 		turnRadarRight(360);
-		int state = getState();
-		///ssa int action = table.selectAction(state);
-		while (true) {
-			// radarMovement();
-			// gunMovement();
-			// robotMovement();
-			// choose a from state buffer using policy
-			//int action = table.selectAction(state);
-	int action = table.selectAction(state);	//// (Q)
 
-			switch (action) {
-			case LUT.GoAhead:
-				setAhead(LUT.OneStepDistance);
+		//int state = getLUTState();
+		double[] states = getNNState();
 
-				break;
-			case LUT.GoBack:
-				setBack(LUT.OneStepDistance);
-				break;
-			case LUT.GoFWDLeft:
-				setTurnLeft(LUT.OneStepAngle);
-				// setAhead(LUT.OneStepDistance);
-
-				// setTurnLeft(180 - (target.bearing + 90 - 30));
-				break;
-			case LUT.GoFWDRight:
-				// setAhead(LUT.OneStepDistance);
-				setTurnRight(LUT.OneStepAngle);
-				// setAhead(LUT.OneStepDistance);
-
-				// setTurnRight(target.bearing + 90 - 30);
-				break;
-			case LUT.GoBWDLeft:
-				setTurnRight(LUT.OneStepAngle);
-				// setAhead(LUT.OneStepDistance);
-
-				// setTurnRight(target.bearing + 90 - 30);
-				break;
-			case LUT.GoBWDRight:
-				setTurnLeft(LUT.OneStepAngle);
-				// setAhead(target.bearing);
-
-				// setTurnLeft(180 - (target.bearing + 90 - 30));
-				break;
-			case LUT.GoFireAtWill:
-				// firePower = 400/target.distance;
-				// if (firePower > 3)
-				// firePower = 3;
-
-				radarMovement();
-				// gunMovement();
-				gunMovement();
-				if (getGunHeat() == 0) {
-					setFire(firePower);
-					reinforcement -= 1;
-					// reinforcement-=5;
-				}
-				break;
-			case LUT.GoFindATarget:
-				radarMovement();
-				break;
-
-			}
-			// take action a
-
-			execute();
-			if (getTime() - target.ctime > 1)
-				isAiming = 0;
-			// observe r,s'
-			state = getState();
-			// renew Q(s,a)
-			// if(reinforcement!=0)
-		//////(sa)action = table.selectAction(state);
-			table.learn(state, action, reinforcement);
-
-			reinforcement = 0.0;
-			// save s' to state buffer
-
-		}
-
+        while (true) {
+            mCurrentStateSnapshot = getNNState();
+            int action = getAction(ACTION_MODE_EPSILON_GREEDY, mCurrentStateSnapshot);
+            //use LUT to select action
+            //int action = table.selectAction(state);
+            mCurrentAction = action;
+            takeAction(action);
+            // use LUT learning
+            // table.learn(state, action, reinforcement);
+            learn();
+            reinforcement = 0.0;
+        }
 	}
 
-	private int getState() {
+    private void learn() {
+        double qPrevNew, qPrevOld, qPrevDelta, qNext;
+
+        double [] currentActionQs;
+        double [] previousActionQs;
+        double [] previousActionQsUpdated;
+        double [] trainingErrors;
+        int action;
+        int index;
+
+        // Take a snapshot of the current state
+        mCurrentStateSnapshot = getNNState();
+        // Feed forward the current state to the neural network and get state-action Q-value
+        currentActionQs = mNeuralNet.outputFor(mCurrentStateSnapshot);
+        // Feed forward the previous state to the neural network and get state-action Q-value
+        previousActionQs = mNeuralNet.outputFor(mPreviousStateSnapshot);
+
+        switch (mCurrentLearningPolicy)
+        {
+            // No learning at all (baseline)
+            case NO_LEARNING_RANDOM:
+                action = getRandomInt(0, ACTION_DIMENSIONALITY - 1);
+                takeAction(action);
+                break;
+            case NO_LEARNING_GREEDY:
+                //TODO: Complete Action_Mode_Max_Q in getAction function (choosing max Q action and don't learn)
+                action = getAction(ACTION_MODE_MAX_Q, mCurrentStateSnapshot);
+                // Take the action
+                takeAction(action);
+                break;
+            // On-policy (SARSA)
+            case SARSA:
+                // Choose an on-policy action
+                action = getAction(ACTION_MODE_EPSILON_GREEDY, mCurrentStateSnapshot);
+
+                // Calculate new value for previous Q;
+                qNext = currentActionQs[action];
+                qPrevOld = previousActionQs[mPreviousAction];
+                qPrevNew = calculateQPrevNew(qNext, qPrevOld);
+                qPrevDelta = Math.abs(qPrevNew - qPrevOld);
+
+                if (qPrevDelta > mRoundHighestDeltaQ)
+                {
+                    mRoundHighestDeltaQ = qPrevDelta;
+                }
+                if (qPrevDelta < mRoundLowestDeltaQ)
+                {
+                    mRoundLowestDeltaQ = qPrevDelta;
+                }
+                mRoundTotalDeltaQ += Math.abs(qPrevNew - qPrevOld);
+                mRoundDeltaQNum++;
+
+                // Backpropagate the action through the neural network
+                // Replace the old previous Q value with the new one
+                previousActionQs[mPreviousAction] = qPrevNew;
+                // Train the neural network with the new dataset
+                trainingErrors = mNeuralNet.train(createTrainingSet(mPreviousStateSnapshot, previousActionQs));
+                for (index = 0; index < NUM_OUTPUTS; index++)
+                {
+                    mAverageBackpropErrors[getRoundNum()-1][index] += trainingErrors[index];
+                }
+
+                previousActionQsUpdated = mNeuralNet.outputFor(mPreviousStateSnapshot);
+
+                // put the old q Val back in the array
+                previousActionQs[mPreviousAction] = qPrevOld;
+
+                // Reset reward until the next learn
+                mCurrentReward = 0.0;
+
+                // Take the next action
+                takeAction(action);
+                break;
+            // Off-policy (Q-Learning)
+            case Q_LEARNING:
+
+                action = getAction(ACTION_MODE_EPSILON_GREEDY, mCurrentStateSnapshot);
+                // Take the action
+                takeAction(action);
+                // Record our previous state snapshot
+                mPreviousStateSnapshot = mCurrentStateSnapshot.clone();
+                // Observe the new environment
+                mCurrentStateSnapshot = getNNState();
+                // Feed forward the current state to the neural network
+                currentActionQs = mNeuralNet.outputFor(mCurrentStateSnapshot);
+                // Get the action hash that has the maximum Q for this state
+                action = getAction(ACTION_MODE_MAX_Q, mCurrentStateSnapshot);
+                // Calculate new value for previous Q;
+                qNext = currentActionQs[action];
+                qPrevOld = previousActionQs[mPreviousAction];
+                qPrevNew = calculateQPrevNew(qNext, qPrevOld);
+                // Backpropagate the action through the neural network
+                // Replace the old previous Q value with the new one
+                previousActionQs[mPreviousAction] = qPrevNew;
+                // Train the neural network with the new dataset
+                mNeuralNet.train(createTrainingSet(mPreviousStateSnapshot, previousActionQs));
+
+                // Reset reward until the next learn
+                mCurrentReward = 0.0;
+
+                break;
+            default:
+                break;
+        }
+
+        // Record our previous state snapshot
+        mPreviousStateSnapshot = mCurrentStateSnapshot.clone();
+
+
+    }
+
+    private List<List<Double>> createTrainingSet(double [] inputVectorArray, double [] outputVectorArray)
+    {
+        int i;
+        List<List<Double>> trainingSet = new ArrayList<>();
+        List<Double> inputVector = new ArrayList<>();
+        List<Double> outputVector = new ArrayList<>();
+
+        // Convert ArrayLists into static arrays
+        for(i = 0; i < NUM_INPUTS; i++)
+        {
+            inputVector.add(inputVectorArray[i]);
+        }
+        for(i = 0; i < NUM_OUTPUTS; i++)
+        {
+            outputVector.add(outputVectorArray[i]);
+        }
+
+        trainingSet.add(inputVector);
+        trainingSet.add(outputVector);
+
+        return trainingSet;
+    }
+
+
+    private void takeAction(int action) {
+        switch (action) {
+            case LUT.GoAhead:
+                setAhead(LUT.OneStepDistance);
+
+                break;
+            case LUT.GoBack:
+                setBack(LUT.OneStepDistance);
+                break;
+            case LUT.GoFWDLeft:
+                setTurnLeft(LUT.OneStepAngle);
+                // setAhead(LUT.OneStepDistance);
+
+                // setTurnLeft(180 - (target.bearing + 90 - 30));
+                break;
+            case LUT.GoFWDRight:
+                // setAhead(LUT.OneStepDistance);
+                setTurnRight(LUT.OneStepAngle);
+                // setAhead(LUT.OneStepDistance);
+
+                // setTurnRight(target.bearing + 90 - 30);
+                break;
+            case LUT.GoBWDLeft:
+                setTurnRight(LUT.OneStepAngle);
+                // setAhead(LUT.OneStepDistance);
+
+                // setTurnRight(target.bearing + 90 - 30);
+                break;
+            case LUT.GoBWDRight:
+                setTurnLeft(LUT.OneStepAngle);
+                // setAhead(target.bearing);
+
+                // setTurnLeft(180 - (target.bearing + 90 - 30));
+                break;
+            case LUT.GoFireAtWill:
+                // firePower = 400/target.distance;
+                // if (firePower > 3)
+                // firePower = 3;
+
+                radarMovement();
+                // gunMovement();
+                gunMovement();
+                if (getGunHeat() == 0) {
+                    setFire(firePower);
+                    reinforcement -= 1;
+                    // reinforcement-=5;
+                }
+                break;
+            case LUT.GoFindATarget:
+                radarMovement();
+                break;
+
+        }
+        execute();
+        if (getTime() - target.ctime > 1)
+            isAiming = 0;
+        mPreviousAction = mCurrentAction;
+    }
+
+    private int getLUTState() {
 		int heading = LUT.calculateHeading(getHeading());
 		int targetDistance = LUT.calculateTargetDistance(target.distance);
 		int targetBearing = LUT.calculateTargetBearing(target.bearing);
-		// int selfenergy1=LUT.calculateSelfEnergy(getEnergy());
-		int walldistance = LUT.calculateWallDistance(getX(), getY(), 800, 600);
-
-		////////////////////////////// out.println("Stste(" + "heading" + heading +
-		////////////////////////////// ",targetDistance: + " + targetDistance +
-		////////////////////////////// ",targetBearing "
-		////////////////////////////// + targetBearing + ",walldistance " + walldistance
-		////////////////////////////// + ",isAiming " + isAiming + " )");
 		int state = LUT.StateTable[heading][targetDistance][targetBearing][isAiming];
 		return state;
 	}
+
+    private double[] getNNState() {
+        int heading = LUT.calculateHeading(getHeading());
+        int targetDistance = LUT.calculateTargetDistance(target.distance);
+        int targetBearing = LUT.calculateTargetBearing(target.bearing);
+        double[] state = new double[STATE_DIMENSIONALITY];
+        state[0] = -1+ 0.125 * heading/45;
+        state[1] = -1 + targetDistance;
+        state[2] = -1+ 0.125 * targetBearing / 45;
+        state[3] = isAiming;
+        return state;
+    }
 
 	private void radarMovement() {
 		double radarOffset;
@@ -256,25 +447,15 @@ public class RFLROBOCODE extends AdvancedRobot {
 
 	// gets the absolute bearing between to x,y coordinates
 	public void onStatus(StatusEvent e) {
-		
-		
-		
-		
-		
 	}
 
 	public void onBulletHit(BulletHitEvent e) {
-		if (target.name == e.getName()) {
-			// double power = e.getBullet().getPower();
-			// double change = 4 * power + 2 * (power - 1);
-			// double change = e.getBullet().getPower() * 20;
-			/////////////////// out.println("Bullet Hit: " + "20");
+		if (target.name.equals(e.getName())) {
 			reinforcement += 20;
 		}
 	}
 
 	public void onBulletHitBullet(BulletHitBulletEvent e) {
-		//
 	}
 
 	public void onBulletMissed(BulletMissedEvent e) {
@@ -284,10 +465,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 	}
 
 	public void onHitByBullet(HitByBulletEvent e) {
-		if (target.name == e.getName()) {
-			// double power = e.getBullet().getPower();
-			// double change = -5*(4 * power + 2 * (power - 1));
-			////////////////////////// out.println("Hit By Bullet: " + "-20");
+		if (target.name.equals(e.getName())) {
 			reinforcement -= 20;
 		}
 
@@ -302,22 +480,12 @@ public class RFLROBOCODE extends AdvancedRobot {
 	}
 
 	public void onHitWall(HitWallEvent e) {
-
 		double change = -5;
-		////////////////// out.println("Hit Wall: " + change);
 		reinforcement += change;
-		// isHitWall = 1;
 	}
 
-	/**
-	 * onScannedRobot: What to do when you see another robot
-	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
 		isAiming = 1;
-		/*
-		 
-		 */
-		// reinforcement+=1;
 		if ((e.getDistance() < target.distance) || (target.name == e.getName())) {
 			// the next line gets the absolute bearing to the point where the bot is
 			double absbearing_rad = (getHeading() / 360 * 2 * PI + e.getBearingRadians()) % (2 * PI);
@@ -345,7 +513,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 
 	public void onRobotDeath(RobotDeathEvent e) {
 
-		if (e.getName() == target.name)
+		if (e.getName().equals(target.name))
 			target.distance = 10000;
 	}
 
@@ -366,7 +534,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 
 			if (LUT.RoundCount == 3000) {
 				try {
-					RobocodeFileWriter file1 = new RobocodeFileWriter(winFile);
+					RobocodeFileWriter file1 = new RobocodeFileWriter(mWRFile);
 					for (int i = 0; i <= 200; ++i) {
 						file1.write(String.valueOf(LUT.filecounterrecord[i]) + " ");
 						file1.write("\n");
@@ -377,22 +545,11 @@ public class RFLROBOCODE extends AdvancedRobot {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-				///////////////// System.out.println("////////////////////////");
-				///////////////// System.out.println(LUT.RoundCount);
-				///////////////// System.out.println("////////////////////////");
-				/*
-				 * if (LUT.RoundCount % 100 == 0) {try { saveData(); } catch (IOException e) {
-				 * // TODO Auto-generated catch block e.printStackTrace(); }
-				 */
-				/*
-								 */
-
 			}
 			
 			if (LUT.RoundCount == 3000) {
 				try {
-					RobocodeFileWriter fileWriter = new RobocodeFileWriter(lutFile1);
+					RobocodeFileWriter fileWriter = new RobocodeFileWriter(mLUTFile);
 				
 					for (int i = 0; i < LUT.NHowManyState; i++)
 						for (int j = 0; j < LUT.NHowManyAction; j++)
@@ -400,7 +557,6 @@ public class RFLROBOCODE extends AdvancedRobot {
 				
 							fileWriter.write(String.valueOf(LUT.table[i][j]));
 							fileWriter.write("\n");
-							// file1.write("a");
 						}
 				
 			
@@ -420,7 +576,6 @@ public class RFLROBOCODE extends AdvancedRobot {
 
 	public void onDeath(DeathEvent event) {
 		LUT.RoundCount++;
-		filecounter += 1;
 		reinforcement -= 20;
 		System.out.println(RLearning.ExploitationRate);
 		DecimalFormat    df   = new DecimalFormat("#0.00"); 
@@ -437,7 +592,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 
 			if (LUT.RoundCount == 3000) {
 				try {
-					RobocodeFileWriter file1 = new RobocodeFileWriter(winFile);
+					RobocodeFileWriter file1 = new RobocodeFileWriter(mWRFile);
 					for (int i = 0; i <= 200; ++i) {
 						file1.write(String.valueOf(LUT.filecounterrecord[i]) + " ");
 						file1.write("\n");
@@ -455,7 +610,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 												
 				//FileWriter fileWriter;
 				
-				try {RobocodeFileWriter fileWriter = new RobocodeFileWriter(lutFile1);
+				try {RobocodeFileWriter fileWriter = new RobocodeFileWriter(mLUTFile);
 					
 					for (int i = 0; i < LUT.NHowManyState; i++)
 						for (int j = 0; j < LUT.NHowManyAction; j++)
@@ -473,21 +628,98 @@ public class RFLROBOCODE extends AdvancedRobot {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				
 			}
-			//2
-			
-			
-	
 		}
 	}
 
-	public void saveData() throws IOException {
-		
-	}
+    private int getAction(int mode, double [] currentStateSnapshot)
+    {
+        int index, selectedAction;
+        ArrayList<Integer> qMaxActions = new ArrayList<>();
+        double [] actionQs;
+        double qVal, randomDouble;
+        double qMax = Double.MIN_VALUE;
 
-	public void onKeyPressed(KeyEvent e) {
+        // Feed forward current state snapshot into neural network and obtain a set of action Q values
+        actionQs = mNeuralNet.outputFor(currentStateSnapshot);
+
+        // Get the maximum action
+        for (index = 0; index < ACTION_DIMENSIONALITY; index++)
+        {
+            qVal = actionQs[index];
+
+            // Update current max
+            if (qVal > qMax)
+            {
+                // New max, clear array
+                // We can have a maximum of the number of possible actions as the number of possible actions
+                qMaxActions = new ArrayList<>();
+                qMaxActions.add(index);
+                qMax = qVal;
+            }
+            else if (qVal == qMax)
+            {
+                // We found a q value equal to the max, add it to the possible actions
+                qMaxActions.add(index);
+            }
+        }
+        if (qMaxActions.size() == 1)
+        {
+            selectedAction = qMaxActions.get(0);
+        }
+        else
+        {
+            selectedAction = getRandomInt(0, qMaxActions.size());
+        }
+
+
+        switch (mode)
+        {
+            // If we're choosing epsilon greedy, then we must choose between max Q or exploratory, so do that here
+            case ACTION_MODE_EPSILON_GREEDY:
+                Random random = new Random();
+                randomDouble = random.nextDouble();
+                if (randomDouble < EPSILON)
+                {
+                    // Take random action
+                    selectedAction = getRandomInt(0, ACTION_DIMENSIONALITY - 1);
+                }
+                else
+                {
+                    // Take greedy action
+                    // so do nothing here
+                }
+                break;
+            // We should already have max Q from above, so choose that
+            default:
+                // We should never be here
+                break;
+        }
+
+        return selectedAction;
+    }
+
+    private int getRandomInt(int min, int max)
+    {
+        int result;
+        Random random;
+
+        random = new Random();
+        result = random.nextInt(max - min + 1) + min;
+
+        return result;
+    }
+
+    private double calculateQPrevNew(double qNext, double qPrevOld)
+    {
+        double qPrevNew;
+
+        qPrevNew = qPrevOld + (ALPHA * (reinforcement + (GAMMA * qNext) - qPrevOld));
+
+        return qPrevNew;
+    }
+
+    public void onKeyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_0:
 			setColors(Color.red, Color.red, Color.red); // save to file

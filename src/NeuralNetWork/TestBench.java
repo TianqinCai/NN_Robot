@@ -4,14 +4,14 @@ import java.io.*;
 import java.util.*;
 
 public class TestBench {
-    private static final int MAXIMUM_EPOCHS = 3000;
+    private static final int MAXIMUM_EPOCHS = 8000;
     private static final double CONVERGENCE_ERROR = 0.1;
     private static final int NUM_INPUTS = 4;
-    private static final int NUM_HIDDEN_NEURONS = 100;
-    private static final int NUM_OUTPUTS = 5;
+    private static final int NUM_HIDDEN_NEURONS = 80;
+    private static final int NUM_OUTPUTS = 8;
 
-    private static final double MIN_VAL = -0.5;
-    private static final double MAX_VAL = 0.5;
+    private static final double MIN_VAL = -1;
+    private static final double MAX_VAL = 1;
     private static final double MOMENTUM = 0.2;
     private static final double LEARNING_RATE = 0.0001;
 
@@ -19,7 +19,7 @@ public class TestBench {
     private static final String LUT_FILE_NAME = "Action1.csv";
     private static File mLutFile;
 
-    private static double[][][][][] LUTContent = new double[8][3][8][2][5];
+    private static double[][][][][] LUTContent = new double[8][3][8][2][8];
     private static List<List<List<Double>>> totalTrainingSet = new ArrayList<>();
     private static List<List<Double>> trainingSet;
     private static List<Double> inputs;
@@ -98,7 +98,8 @@ public class TestBench {
                 {
                     setCummError += errors[output] * errors[output];
                 }
-                setCummError /= 5;
+                // divided by action number
+                setCummError /= 8;
                 cummError += setCummError;
             }
 
@@ -137,8 +138,8 @@ public class TestBench {
                         inputs.add(d2);
                         inputs.add(d3);
                         inputs.add(d4);
-                        for(int a = 0; a < 5; a++){
-                            outputs.add(customSigmoid(LUTContent[s1][s2][s3][s4][a]));
+                        for(int a = 0; a < 8; a++){
+                            outputs.add(LUTContent[s1][s2][s3][s4][a]/67.9);
                         }
                         trainingSet.add(inputs);
                         trainingSet.add(outputs);
@@ -159,7 +160,7 @@ public class TestBench {
                 for(int s2 = 0; s2 < 3; s2++){
                     for(int s3 = 0; s3 < 8; s3++){
                         for(int s4 = 0; s4 < 2; s4++){
-                            for(int a = 0; a < 5; a++){
+                            for(int a = 0; a < 8; a++){
                                 LUTContent[s1][s2][s3][s4][a] = inputScanner.nextDouble();
                             }
                         }
