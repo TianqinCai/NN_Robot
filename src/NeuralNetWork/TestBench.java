@@ -4,15 +4,15 @@ import java.io.*;
 import java.util.*;
 
 public class TestBench {
-    private static final int MAXIMUM_EPOCHS = 8000;
+    private static final int MAXIMUM_EPOCHS = 5000;
     private static final double CONVERGENCE_ERROR = 0.1;
     private static final int NUM_INPUTS = 4;
-    private static final int NUM_HIDDEN_NEURONS = 80;
+    private static final int NUM_HIDDEN_NEURONS = 20;
     private static final int NUM_OUTPUTS = 8;
 
     private static final double MIN_VAL = -1;
     private static final double MAX_VAL = 1;
-    private static final double MOMENTUM = 0.2;
+    private static final double MOMENTUM = 0.8;
     private static final double LEARNING_RATE = 0.0001;
 
     // LUT file and properties
@@ -40,6 +40,7 @@ public class TestBench {
 
         NNObject = new NeurualNetWork(NUM_INPUTS, NUM_HIDDEN_NEURONS, NUM_OUTPUTS, LEARNING_RATE, MOMENTUM, MIN_VAL, MAX_VAL);
         runTrials(NNObject, totalTrainingSet, CONVERGENCE_ERROR, MAXIMUM_EPOCHS, results);
+        System.out.println(results.size());
         try {
             printTrialResults(results, "convergence.csv");
             NNObject.saveWeight();
