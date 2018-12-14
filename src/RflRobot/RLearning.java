@@ -11,21 +11,9 @@ import robocode.*;
 
 public class RLearning {
 
-	public static double a = 0;
-	// double[][] table= new double[LUT.NHowManyState][LUT.NHowManyAction];
-
 	public RLearning() {
-
-		// initialize();
 	}
 
-	private void initialize() {
-		Random random = new Random();
-		for (int i = 0; i < LUT.NHowManyState; i++)
-			for (int j = 0; j < LUT.NHowManyAction; j++)
-				LUT.table[i][j] = random.nextDouble() - 1;
-		// table[i][j] = 0;
-	}
 
 	public double getMaxQValue(int state) {
 		double maxinum = Double.NEGATIVE_INFINITY;
@@ -47,10 +35,10 @@ public class RLearning {
 				bestAction = i;
 			}
 		}
-		////////////// System.out.println("Action " + bestAction + ": " + maxinum);
 		return bestAction;
 	}
 
+	//TODO: no need to transfer to 2D array, we can input a state array
 	public double getQValue(int state, int action) {
 		return LUT.table[state][action];
 	}

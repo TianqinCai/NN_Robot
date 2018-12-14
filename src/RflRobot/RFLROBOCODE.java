@@ -551,8 +551,8 @@ public class RFLROBOCODE extends AdvancedRobot {
 				try {
 					RobocodeFileWriter fileWriter = new RobocodeFileWriter(mLUTFile);
 				
-					for (int i = 0; i < LUT.NHowManyState; i++)
-						for (int j = 0; j < LUT.NHowManyAction; j++)
+					for (int i = 0; i < LUT.STATE_DIMENSIONALITY; i++)
+						for (int j = 0; j < LUT.ACTION_DIMENSIONALITY; j++)
 						{
 				
 							fileWriter.write(String.valueOf(LUT.table[i][j]));
@@ -612,8 +612,8 @@ public class RFLROBOCODE extends AdvancedRobot {
 				
 				try {RobocodeFileWriter fileWriter = new RobocodeFileWriter(mLUTFile);
 					
-					for (int i = 0; i < LUT.NHowManyState; i++)
-						for (int j = 0; j < LUT.NHowManyAction; j++)
+					for (int i = 0; i < LUT.STATE_DIMENSIONALITY; i++)
+						for (int j = 0; j < LUT.ACTION_DIMENSIONALITY; j++)
 					 {
 					
 							fileWriter.write(String.valueOf(LUT.table[i][j]));
