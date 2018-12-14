@@ -1,89 +1,75 @@
 package RflRobot;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Random;
-
-import robocode.*;
 
 public class RLearning {
 
-	public RLearning() {
+	private static double mLearningRate;
+	private static double mDiscountRate;
+	private static double mExplorationRate;
+	public static int lastState;
+	public static int lastAction;
+
+	public RLearning(double learningRate, double discountRate, double exploitationRate){
+		this.mLearningRate = learningRate;
+		this.mDiscountRate = discountRate;
+		this.mExplorationRate = exploitationRate;
 	}
 
 
 	public double getMaxQValue(int state) {
-		double maxinum = Double.NEGATIVE_INFINITY;
-		for (int i = 0; i < LUT.table[state].length; i++) {
-			if (LUT.table[state][i] > maxinum)
-				maxinum = LUT.table[state][i];
+		double maxQValue = Double.MIN_VALUE;
+		for (int i = 0; i < LUT.ACTION_DIMENSIONALITY; i++) {
+			if (LUT.LUTTable[state][i] > maxQValue)
+				maxQValue = LUT.LUTTable[state][i];
 		}
-		return maxinum;
+		return maxQValue;
 	}
 
 	public int getBestAction(int state) {
-		double maxinum = Double.NEGATIVE_INFINITY;
+		double maxQValue = Double.MIN_VALUE;
 		int bestAction = 0;
-		for (int i = 0; i < LUT.table[state].length; i++) {
-			double qValue = LUT.table[state][i]; ///////////////////////////////////////////////
+		double qValue;
+		for (int i = 0; i < LUT.ACTION_DIMENSIONALITY; i++) {
+			qValue = LUT.LUTTable[state][i];
 
-			if (qValue > maxinum) {
-				maxinum = qValue;
+			if (qValue > maxQValue) {
+				maxQValue = qValue;
 				bestAction = i;
 			}
 		}
 		return bestAction;
 	}
 
-	//TODO: no need to transfer to 2D array, we can input a state array
 	public double getQValue(int state, int action) {
-		return LUT.table[state][action];
+		return LUT.LUTTable[state][action];
 	}
 
 	public void setQValue(int state, int action, double value) {
-		//if (LUT.table[state][action] != value) {
-			//++a;//////////////////// System.out.println("******changed for"+a+"times******");
-		//}
-		LUT.table[state][action] = value;
+		LUT.LUTTable[state][action] = value;
 	}
 
-	public final double LearningRate = 0.2;
-	public final double DiscountRate = 0.99;
-	public static double ExploitationRate = 0.3;
-	public static int lastState;
-	public static int lastAction;
-	private boolean first = true;
+	//TODO: Q-Learning and SARSA
+	public void QLearn(int state, int action, double reinforcement) {
 
-	public void learn(int state, int action, double reinforcement) {
-		//////////////////// System.out.println("Reinforcement: " + reinforcement);
-		if (first)
-			first = false;
-		else {
-			double oldQValue = getQValue(lastState, lastAction);
-			double newQValue = (1 - LearningRate) * oldQValue
-					+ LearningRate * (reinforcement + DiscountRate * getQValue(state,action));
-			////////////// System.out.println("Old Q-Value: " + oldQValue + ", New Q-Value:
-			////////////// " + newQValue + ", Different: " + (newQValue - oldQValue));
-			
-			
-			setQValue(lastState, lastAction, newQValue);
-		}
+		double oldQValue = getQValue(lastState, lastAction);
+		double newQValue = oldQValue + mLearningRate * (reinforcement + mDiscountRate * getQValue(state,action) - oldQValue);
+		setQValue(lastState, lastAction, newQValue);
+
 		lastState = state;
 		lastAction = action;
 	}
 
-	public int selectAction(int state) {
-		
-		// double[] value = new double[LUT.NHowManyAction];
-		Random random = new Random();
-		
+	public void SARSA(int state, int action, double reinforcement){
 
-		if ((1 - random.nextDouble()) <= ExploitationRate) {
-			//////////////////// System.out.println("RANDOM!");
-			return random.nextInt(8);
+	}
+
+	public int selectAction(int state) {
+
+		Random random = new Random();
+
+		if ((1 - random.nextDouble()) <= mExplorationRate) {
+			return random.nextInt(LUT.ACTION_DIMENSIONALITY);
 		} else
 			return getBestAction(state);
 

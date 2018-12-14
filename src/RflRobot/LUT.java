@@ -1,10 +1,16 @@
 package RflRobot;
 
 public class LUT {
+	//winRate log
 	public static int WinCount;
 	public static int RoundCount;
-	//TODO: rename this variable
-	public static double filecounterrecord[];
+	public static double winRateLog[];
+
+	//Action and State dimensionality
+	public static final int ACTION_DIMENSIONALITY = 8;
+	public static final int STATE_DIMENSIONALITY;
+
+	//Action Indexx
 	public static final int GoAhead = 0;
 	public static final int GoBack = 1;
 	public static final int GoFWDLeft = 2;
@@ -14,12 +20,11 @@ public class LUT {
 	public static final int GoFindATarget = 6;
 	public static final int GoFireAtWill = 7;
 
+	//Action Parameter
 	public static final double OneStepDistance = 50.0;
 	public static final double OneStepAngle = 30;
 
-	//public static final int STATE_DIMENSIONALITY = 6;
-	public static final int ACTION_DIMENSIONALITY = 8;
-
+	//State Parameter
 	public static final int NHeading = 8;
 	public static final int NTargetDistance = 3;
 	public static final int NTargetBearing = 8;
@@ -27,14 +32,12 @@ public class LUT {
 	//neglecting the following two states for space reduction
 	public static final int NSelfEnergy = 5;
 	public static final int NWallDistance = 3;
-	public static double[][] table;
-
-	public static final int STATE_DIMENSIONALITY;
 
 	public static final int StateTable[][][][];
+	public static double[][] LUTTable;
 
 	static {
-		filecounterrecord = new double[301];
+		winRateLog = new double[301];
 		WinCount = 0;
 		RoundCount = 0;
 		StateTable = new int[NHeading][NTargetDistance][NTargetBearing][NIsAiming];
@@ -52,10 +55,10 @@ public class LUT {
 		}
 
 		STATE_DIMENSIONALITY = stateNumberCounter;
-		table = new double[LUT.STATE_DIMENSIONALITY][LUT.ACTION_DIMENSIONALITY];
+		LUTTable = new double[LUT.STATE_DIMENSIONALITY][LUT.ACTION_DIMENSIONALITY];
 		for (int i = 0; i < LUT.STATE_DIMENSIONALITY; i++)
 			for (int j = 0; j < LUT.ACTION_DIMENSIONALITY; j++)
-				table[i][j] = 0; // = random.nextDouble()-1;
+				LUTTable[i][j] = 0; // = random.nextDouble()-1;
 	}
 
 	public static int calculateTargetDistance(double TargetDistance) {
