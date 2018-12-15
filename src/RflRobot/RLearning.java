@@ -7,8 +7,8 @@ public class RLearning {
 	private static double mLearningRate;
 	private static double mDiscountRate;
 	private static double mExplorationRate;
-	public static int lastState;
-	public static int lastAction;
+	private static int lastState;
+	private static int lastAction;
 
 	public RLearning(double learningRate, double discountRate, double exploitationRate){
 		this.mLearningRate = learningRate;

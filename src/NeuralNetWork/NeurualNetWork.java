@@ -318,7 +318,7 @@ public class NeurualNetWork implements NeuralNetInterface {
      * value that should be mapped to the given input vector. I.e.
      * the desired correct output value for an input.
      * @param X The input vector
-     * @param argValue The new value to learn
+     * @param argValue The new value to offPolicyLearn
      * @return The error in the output for that input vector
      */
     public double[] train(List<List<Double>> trainingSet) {
@@ -421,11 +421,10 @@ public class NeurualNetWork implements NeuralNetInterface {
 
     }
 
+    //save the weight as object
     public void saveWeight() {
         File output = new File("Weights.data");
         try {
-            boolean createNewFile = output.createNewFile();
-            BufferedWriter out = new BufferedWriter(new FileWriter(output));
             FileOutputStream fileOutputStream = new FileOutputStream(output);
             ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
             List<List<List<Double>>> weights = getWeights();
@@ -435,8 +434,6 @@ public class NeurualNetWork implements NeuralNetInterface {
             outputStream.flush();
             outputStream.close();
 
-
-            //ToDO:put the weight into the output file
         } catch (IOException e){
             System.out.println("IOException");
         }
@@ -469,22 +466,7 @@ public class NeurualNetWork implements NeuralNetInterface {
      * @throws IOException
      */
     public void load(String argFileName) throws IOException {
-
+        //this part was done in testBench
     }
 
-    public void loadLUT(String argFileName) throws IOException{
-//        FileInputStream fileInputStream;
-//        try {
-//            fileInputStream = new FileInputStream(argFileName);
-//            Scanner inputScanner = new Scanner(fileInputStream);
-//            for (int i = 0; i < LUTHowManyState; i++) {
-//                for (int j = 0; j < LUTHowManyAction; j++) {
-//                    LUTTable[i][j] = customSigmoid(inputScanner.nextDouble());
-//                }
-//            }
-//        } catch (FileNotFoundException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-    }
 }
