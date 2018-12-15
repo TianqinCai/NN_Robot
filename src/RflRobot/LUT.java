@@ -1,5 +1,10 @@
 package RflRobot;
 
+import robocode.RobocodeFileWriter;
+
+import java.io.File;
+import java.io.IOException;
+
 public class LUT {
 	//winRate log
 	public static int WinCount;
@@ -110,5 +115,37 @@ public class LUT {
 			return 1;
 
 		return 2;
+	}
+
+	public static void outputWinRate(File mWRFile){
+		try {
+			RobocodeFileWriter file1 = new RobocodeFileWriter(mWRFile);
+			for (int i = 0; i <= 200; ++i) {
+				file1.write(String.valueOf(LUT.winRateLog[i]) + " ");
+				file1.write("\n");
+			}
+			file1.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void outputLUTTable(File mLUTFile){
+		try {RobocodeFileWriter fileWriter = new RobocodeFileWriter(mLUTFile);
+
+			for (int i = 0; i < LUT.STATE_DIMENSIONALITY; i++)
+				for (int j = 0; j < LUT.ACTION_DIMENSIONALITY; j++)
+				{
+					fileWriter.write(String.valueOf(LUT.LUTTable[i][j]));
+					fileWriter.write("\n");
+				}
+			fileWriter.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

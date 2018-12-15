@@ -93,7 +93,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 	private int isAiming = 0;
 
 	public RFLROBOCODE() {
-		table = new RLearning();
+		table = new RLearning(ALPHA,GAMMA, EPSILON);
 
 	}
 
@@ -124,11 +124,11 @@ public class RFLROBOCODE extends AdvancedRobot {
             mCurrentStateSnapshot = getNNState();
             int action = getAction(ACTION_MODE_EPSILON_GREEDY, mCurrentStateSnapshot);
             //use LUT to select action
-            //int action = table.selectAction(state);
+            //int action = LUTTable.selectAction(state);
             mCurrentAction = action;
             takeAction(action);
             // use LUT learning
-            // table.learn(state, action, reinforcement);
+            // LUTTable.offPolicyLearn(state, action, reinforcement);
             learn();
             reinforcement = 0.0;
         }
@@ -159,7 +159,7 @@ public class RFLROBOCODE extends AdvancedRobot {
                 takeAction(action);
                 break;
             case NO_LEARNING_GREEDY:
-                //TODO: Complete Action_Mode_Max_Q in getAction function (choosing max Q action and don't learn)
+                //TODO: Complete Action_Mode_Max_Q in getAction function (choosing max Q action and don't offPolicyLearn)
                 action = getAction(ACTION_MODE_MAX_Q, mCurrentStateSnapshot);
                 // Take the action
                 takeAction(action);
@@ -201,7 +201,7 @@ public class RFLROBOCODE extends AdvancedRobot {
                 // put the old q Val back in the array
                 previousActionQs[mPreviousAction] = qPrevOld;
 
-                // Reset reward until the next learn
+                // Reset reward until the next offPolicyLearn
                 mCurrentReward = 0.0;
 
                 // Take the next action
@@ -231,7 +231,7 @@ public class RFLROBOCODE extends AdvancedRobot {
                 // Train the neural network with the new dataset
                 mNeuralNet.train(createTrainingSet(mPreviousStateSnapshot, previousActionQs));
 
-                // Reset reward until the next learn
+                // Reset reward until the next offPolicyLearn
                 mCurrentReward = 0.0;
 
                 break;
@@ -512,7 +512,6 @@ public class RFLROBOCODE extends AdvancedRobot {
 	}
 
 	public void onRobotDeath(RobotDeathEvent e) {
-
 		if (e.getName().equals(target.name))
 			target.distance = 10000;
 	}
@@ -522,53 +521,17 @@ public class RFLROBOCODE extends AdvancedRobot {
 		LUT.WinCount++;
 		reinforcement += 20;
 		if (LUT.RoundCount % 100 == 0) {
-			DecimalFormat    df   = new DecimalFormat("#0.00");   
 			double winRatio;
 			if (LUT.RoundCount % 100 == 0) {
 				winRatio = LUT.WinCount;
-				System.out.println(String.valueOf(LUT.RoundCount));
-				System.out.println(String.valueOf(LUT.WinCount));
-				LUT.filecounterrecord[LUT.RoundCount / 100 - 1] = winRatio;
+				LUT.winRateLog[LUT.RoundCount / 100 - 1] = winRatio;
 				LUT.WinCount = 0;
 			}
+			if (LUT.RoundCount == 3000) {
+				LUT.outputWinRate(mWRFile);
+				LUT.outputLUTTable(mLUTFile);
 
-			if (LUT.RoundCount == 3000) {
-				try {
-					RobocodeFileWriter file1 = new RobocodeFileWriter(mWRFile);
-					for (int i = 0; i <= 200; ++i) {
-						file1.write(String.valueOf(LUT.filecounterrecord[i]) + " ");
-						file1.write("\n");
-						/// file1.write("aaa");
-					}
-					file1.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
-			
-			if (LUT.RoundCount == 3000) {
-				try {
-					RobocodeFileWriter fileWriter = new RobocodeFileWriter(mLUTFile);
-				
-					for (int i = 0; i < LUT.STATE_DIMENSIONALITY; i++)
-						for (int j = 0; j < LUT.ACTION_DIMENSIONALITY; j++)
-						{
-				
-							fileWriter.write(String.valueOf(LUT.table[i][j]));
-							fileWriter.write("\n");
-						}
-				
-			
-					fileWriter.close();
-				
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-				
-			
 		}
 		
 
@@ -577,57 +540,18 @@ public class RFLROBOCODE extends AdvancedRobot {
 	public void onDeath(DeathEvent event) {
 		LUT.RoundCount++;
 		reinforcement -= 20;
-		System.out.println(RLearning.ExploitationRate);
-		DecimalFormat    df   = new DecimalFormat("#0.00"); 
 		if (LUT.RoundCount % 100 == 0) {
-			double winRatio = 0;
-			
+			double winRatio;
+			//TODO: move this part to LUT
 			if (LUT.RoundCount % 100 == 0) {
 				winRatio = LUT.WinCount;
-				LUT.filecounterrecord[LUT.RoundCount / 100 - 1] = winRatio;
-				System.out.println(String.valueOf(LUT.RoundCount));
-				System.out.println(String.valueOf(LUT.WinCount));
+				LUT.winRateLog[LUT.RoundCount / 100 - 1] = winRatio;
 				LUT.WinCount = 0;
 			}
-
 			if (LUT.RoundCount == 3000) {
-				try {
-					RobocodeFileWriter file1 = new RobocodeFileWriter(mWRFile);
-					for (int i = 0; i <= 200; ++i) {
-						file1.write(String.valueOf(LUT.filecounterrecord[i]) + " ");
-						file1.write("\n");
-						// file1.write("a");
-					}
-					file1.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				LUT.outputWinRate(mWRFile);
+				LUT.outputLUTTable(mLUTFile);
 
-			}
-			//1
-			if (LUT.RoundCount == 3000) {
-												
-				//FileWriter fileWriter;
-				
-				try {RobocodeFileWriter fileWriter = new RobocodeFileWriter(mLUTFile);
-					
-					for (int i = 0; i < LUT.STATE_DIMENSIONALITY; i++)
-						for (int j = 0; j < LUT.ACTION_DIMENSIONALITY; j++)
-					 {
-					
-							fileWriter.write(String.valueOf(LUT.table[i][j]));
-							fileWriter.write("\n");
-					// file1.write("a");
-				}
-					
-				
-					fileWriter.close();
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 		}
 	}
@@ -720,60 +644,6 @@ public class RFLROBOCODE extends AdvancedRobot {
     }
 
     public void onKeyPressed(KeyEvent e) {
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_0:
-			setColors(Color.red, Color.red, Color.red); // save to file
-
-			RLearning.ExploitationRate = 0.0;
-			break;
-		case KeyEvent.VK_1:
-			setColors(Color.red, Color.red, Color.red); // save to file
-
-			RLearning.ExploitationRate = 0.1;
-			break;
-		case KeyEvent.VK_2:
-			setColors(Color.white, Color.white, Color.white);// save to file
-			RLearning.ExploitationRate = 0.2;
-			break;
-		case KeyEvent.VK_3:
-			setColors(Color.red, Color.red, Color.red); // save to file
-
-			RLearning.ExploitationRate = 0.3;
-			break;
-		case KeyEvent.VK_4:
-			setColors(Color.white, Color.white, Color.white);// save to file
-
-			RLearning.ExploitationRate = 0.4;
-			break;
-		case KeyEvent.VK_5:
-			setColors(Color.white, Color.white, Color.white);// save to file
-
-			RLearning.ExploitationRate = 0.5;
-			break;
-		case KeyEvent.VK_6:
-			setColors(Color.white, Color.white, Color.white);// save to file
-
-			RLearning.ExploitationRate = 0.6;
-			break;
-		case KeyEvent.VK_7:
-			setColors(Color.white, Color.white, Color.white);// save to file
-
-			RLearning.ExploitationRate = 0.7;
-			break;
-		case KeyEvent.VK_8:
-			setColors(Color.white, Color.white, Color.white);// save to file
-
-			RLearning.ExploitationRate = 0.8;
-			break;
-		case KeyEvent.VK_9:
-			setColors(Color.pink, Color.pink, Color.pink);// save to file
-
-			RLearning.ExploitationRate = 1;
-			break;
-
-		default: // What to do if any other key is pressed.
-
-		}
 	}
 
 }

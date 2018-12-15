@@ -49,19 +49,31 @@ public class RLearning {
 		LUT.LUTTable[state][action] = value;
 	}
 
-	//TODO: Q-Learning and SARSA
-	public void QLearn(int state, int action, double reinforcement) {
+	public void offPolicyLearn(int state, double reinforcement) {
 
-		double oldQValue = getQValue(lastState, lastAction);
-		double newQValue = oldQValue + mLearningRate * (reinforcement + mDiscountRate * getQValue(state,action) - oldQValue);
-		setQValue(lastState, lastAction, newQValue);
+		int action = getBestAction(state);
+		double qNext = getQValue(state, action);
+		double qPrevOld = getQValue(lastState, lastAction);
+		//calculate new value for previous Q
+		double qPrevNew = qPrevOld + mLearningRate * (reinforcement + mDiscountRate * qNext - qPrevOld);
+		//replace the old previous Q value with the new one
+		setQValue(lastState, lastAction, qPrevNew);
 
 		lastState = state;
 		lastAction = action;
 	}
 
-	public void SARSA(int state, int action, double reinforcement){
+	public void onPolicyLearn(int state, int action, double reinforcement) {
 
+		double qNext = getQValue(state, action);
+		double qPrevOld = getQValue(lastState, lastAction);
+		//calculate new value for previous Q
+		double qPrevNew = qPrevOld + mLearningRate * (reinforcement + mDiscountRate * qNext - qPrevOld);
+		//replace the old previous Q value with the new one
+		setQValue(lastState, lastAction, qPrevNew);
+
+		lastState = state;
+		lastAction = action;
 	}
 
 	public int selectAction(int state) {

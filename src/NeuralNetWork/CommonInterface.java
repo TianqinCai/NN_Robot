@@ -16,7 +16,7 @@ public interface CommonInterface {
      * value that should be mapped to the given input vector. I.e.
      * the desired correct output value for an input.
      * @param X The input vector
-     * @param argValue The new value to learn
+     * @param argValue The new value to offPolicyLearn
      * @return The error in the output for that input vector
      */
     public double[] train(List<List<Double>> trainingSet);
