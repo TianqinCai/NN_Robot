@@ -54,7 +54,7 @@ public class LUTNeurualNetWork extends NeurualNetWork {
         }
     }
 
-    //initializing the state table
+    //initializing the state LUTTable
     public void setStateTable(){
         //initializing TotalStateNumber and TotalActionNumber:
         StateTable = new double[TotalStateNumber][TotalActionNumber];
@@ -75,7 +75,7 @@ public class LUTNeurualNetWork extends NeurualNetWork {
                 //in this way, we transfer the 1D state number to 4 inputs,
                 // combine with other 2 inputs(bias and action) we got the whole input
 
-                //换句话说，主要作用是让Input匹配上LUT table, 现在LUT table 的存储方式是外循环384 states， 内循环8 action，每个
+                //换句话说，主要作用是让Input匹配上LUT LUTTable, 现在LUT LUTTable 的存储方式是外循环384 states， 内循环8 action，每个
                 //state-action对 对应一个q-value，也就是output
                 //Input 只要能匹配上output就行
                 StateTable[i][j] = ( Math.floor((double) i/ factorialHelper(j)) % lastLevel
