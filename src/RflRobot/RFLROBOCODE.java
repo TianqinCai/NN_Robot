@@ -135,8 +135,14 @@ public class RFLROBOCODE extends AdvancedRobot {
                 int state = getLUTState();
                 int action = rLearning.selectAction(state);
                 takeAction(action);
-                rLearning.offPolicyLearn(state, action, reinforcement);
-                //rLearning.onPolicyLearn(state,action,reinforcement);
+                switch (mCurrentLearningPolicy) {
+                    // No learning at all (baseline)
+                    case SARSA:
+                        rLearning.onPolicyLearn(state, action, reinforcement);
+                        break;
+                    case Q_LEARNING:
+                        rLearning.offPolicyLearn(state, action, reinforcement);
+                }
             }
             reinforcement = 0.0;
         }
