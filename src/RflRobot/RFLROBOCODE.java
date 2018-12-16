@@ -68,6 +68,7 @@ public class RFLROBOCODE extends AdvancedRobot {
     private static double [] mHighestDeltaQ = new double[NUM_ROUNDS];
     private static double [] mLowestDeltaQ = new double[NUM_ROUNDS];
     private static double [][] mAverageBackpropErrors = new double[NUM_ROUNDS][NUM_OUTPUTS];
+    private static double [] mTotalBackpropErrors = new double[NUM_ROUNDS];
     private static double mRoundTotalDeltaQ;
     private static double mRoundHighestDeltaQ = -500.0;
     private static double mRoundLowestDeltaQ = 500.0;
@@ -79,6 +80,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 	private File mLUTFile;
 	private File mWeightFile;
 	private File mErrorFile;
+	private File mTotalErrorFile;
     private static int mStateActionPairOccurence = 0;
     private static final int MAX_OUTPUT_SIZE = 10000;
 
@@ -106,6 +108,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 		mLUTFile =getDataFile("Action1.csv");
 		mErrorFile = getDataFile("Error1.txt");
 		mWeightFile = getDataFile("weight.data");
+        mTotalErrorFile = getDataFile("TotalError.txt");
 
         mNeuralNet = new NeurualNetWork(NUM_INPUTS, NUM_HIDDENS, NUM_OUTPUTS, LEARNING_RATE, MOMENTUM, MIN_VAL, MAX_VAL);
 
@@ -131,7 +134,7 @@ public class RFLROBOCODE extends AdvancedRobot {
                 int action = getAction(ACTION_MODE_EPSILON_GREEDY, mCurrentStateSnapshot);
                 mCurrentAction = action;
                 takeAction(action);
-                NNLearn();
+                NNLearn(NON_TERMINAL_STATE);
             } else {
                 //use LUT with Q-learning
                 int state = getLUTState();
@@ -152,7 +155,7 @@ public class RFLROBOCODE extends AdvancedRobot {
         }
 	}
 
-    private void NNLearn() {
+    private void NNLearn(boolean terminate) {
         double qPrevNew, qPrevOld, qPrevDelta, qNext;
 
         double [] currentActionQs;
@@ -213,7 +216,10 @@ public class RFLROBOCODE extends AdvancedRobot {
                 {
                     mAverageBackpropErrors[getRoundNum()-1][index] += trainingErrors[index];
                 }
-
+                for (int i = 0; i < ACTION_DIMENSIONALITY; i++) {
+                    mTotalBackpropErrors[getRoundNum()-1] += mAverageBackpropErrors[getRoundNum()-1][i];
+                }
+                mTotalBackpropErrors[getRoundNum()-1] /= ACTION_DIMENSIONALITY;
 
                 logErrorForStateActionPair(errorLoggingState, errorLoggingAction, action);
 
@@ -222,6 +228,8 @@ public class RFLROBOCODE extends AdvancedRobot {
                 // put the old q Val back in the array
                 previousActionQs[mPreviousAction] = qPrevOld;
 
+                if(terminate)
+                    return;
                 // Take the next action
                 takeAction(action);
                 break;
@@ -538,6 +546,8 @@ public class RFLROBOCODE extends AdvancedRobot {
 		LUT.RoundCount++;
 		LUT.WinCount++;
 		reinforcement += 60;
+        if(NN_ENABLED)
+            NNLearn(TERMINAL_STATE);
 		if (LUT.RoundCount % 100 == 0) {
 		    //for every 100 rounds, log win rate
             logWinRate();
@@ -547,6 +557,8 @@ public class RFLROBOCODE extends AdvancedRobot {
     public void onDeath(DeathEvent event) {
 		LUT.RoundCount++;
 		reinforcement -= 60;
+        if(NN_ENABLED)
+            NNLearn(TERMINAL_STATE);
 		if (LUT.RoundCount % 100 == 0) {
             //for every 100 rounds, log win rate
             logWinRate();
@@ -557,6 +569,7 @@ public class RFLROBOCODE extends AdvancedRobot {
     {
         LUT.outputWinRate(mWRFile);
         outputError(mErrorFile);
+        outputTotalError(mTotalErrorFile);
         //for NN learning, save the weight
         if(NN_ENABLED)
             mNeuralNet.saveWeight(mWeightFile);
@@ -662,6 +675,20 @@ public class RFLROBOCODE extends AdvancedRobot {
 
             for(int i = 0; i < selectedStateActionErrorSum.length; i++){
                 fileWriter.write(String.valueOf(selectedStateActionErrorSum[i])+" " +"\n");
+            }
+            fileWriter.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void outputTotalError(File output){
+        try {
+            RobocodeFileWriter fileWriter = new RobocodeFileWriter(output);
+
+            for(int i = 0; i < mTotalBackpropErrors.length; i++){
+                fileWriter.write(String.valueOf(mTotalBackpropErrors[i])+" " +"\n");
             }
             fileWriter.close();
         } catch (IOException e) {
