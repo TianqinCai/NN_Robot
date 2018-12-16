@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b3a67510-3aef-4c8a-8964-1cc060d39f21" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -17,14 +18,10 @@
       <file leaf-file-name="RFLROBOCODE.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="137" column="49" lean-forward="true" selection-start-line="137" selection-start-column="49" selection-end-line="137" selection-end-column="49" />
+            <state relative-caret-position="299">
+              <caret line="40" column="45" lean-forward="true" selection-start-line="40" selection-start-column="45" selection-end-line="40" selection-end-column="45" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#16786#16787#0" expanded="true" />
-                <element signature="e#16811#16812#0" expanded="true" />
-                <element signature="e#17091#17092#0" expanded="true" />
-                <element signature="e#17116#17117#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -33,8 +30,8 @@
       <file leaf-file-name="NeurualNetWork.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="464" column="25" selection-start-line="464" selection-start-column="25" selection-end-line="464" selection-end-column="25" />
+            <state relative-caret-position="217">
+              <caret line="422" lean-forward="true" selection-start-line="422" selection-end-line="422" />
             </state>
           </provider>
         </entry>
@@ -42,8 +39,8 @@
       <file leaf-file-name="RLearning.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/RflRobot/RLearning.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="979">
-              <caret line="61" column="26" selection-start-line="61" selection-start-column="26" selection-end-line="61" selection-end-column="26" />
+            <state relative-caret-position="257">
+              <caret line="65" column="16" selection-start-line="65" selection-start-column="16" selection-end-line="65" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -81,6 +78,18 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="LUT.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/RflRobot/LUT.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="232">
+              <caret line="128" column="46" lean-forward="true" selection-start-line="128" selection-start-column="46" selection-end-line="128" selection-end-column="46" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -97,7 +106,7 @@
       <find>custom</find>
       <find>sigmoid</find>
       <find>A</find>
-      <find>learning rate</find>
+      <find />
       <find>argLearning</find>
       <find>train</find>
       <find>TODO</find>
@@ -122,6 +131,7 @@
       <find>getAc</find>
       <find>currentReward</find>
       <find>mLearningNum</find>
+      <find>saveweight</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -146,9 +156,9 @@
         <option value="$PROJECT_DIR$/src/NeuralNetWork/TestBench.java" />
         <option value="$PROJECT_DIR$/src/MettaBots/MettaNN.java" />
         <option value="$PROJECT_DIR$/src/RflRobot/LUT.java" />
-        <option value="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" />
         <option value="$PROJECT_DIR$/src/RflRobot/RFLROBOCODE1.java" />
         <option value="$PROJECT_DIR$/src/RflRobot/RLearning.java" />
+        <option value="$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java" />
         <option value="$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java" />
       </list>
     </option>
@@ -162,10 +172,10 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-112" />
-    <option name="y" value="122" />
-    <option name="width" value="1386" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="1538" />
+    <option name="y" value="100" />
+    <option name="width" value="1387" />
     <option name="height" value="742" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -174,7 +184,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -207,8 +216,9 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -370,6 +380,7 @@
       <workItem from="1544855320555" duration="3670000" />
       <workItem from="1544918666372" duration="2016000" />
       <workItem from="1544924088946" duration="230000" />
+      <workItem from="1544934495068" duration="2266000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <created>1543987085144</created>
@@ -389,10 +400,11 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="150835000" />
+    <option name="totallyTimeSpent" value="153101000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1252" height="671" extended-state="6" />
+    <frame x="1359" y="-7" width="1753" height="954" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -407,7 +419,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23990306" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17078781" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -425,33 +437,33 @@
     </layout>
     <layout-to-restore>
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3293979" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.44503546" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info id="Favorites" order="6" side_tool="true" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17078781" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
-      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3293979" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" weight="0.3293979" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="Version Control" order="10" />
+      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39905548" />
       <window_info id="Capture Tool" order="5" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Messages" order="11" weight="0.3293979" />
       <window_info anchor="right" id="Maven Projects" order="8" />
-      <window_info id="Favorites" order="6" side_tool="true" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
     </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -694,16 +706,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MettaBots/MettaNN.java" />
-    <entry file="file://$PROJECT_DIR$/src/RflRobot/LUT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="125" column="13" selection-start-line="125" selection-start-column="13" selection-end-line="125" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/RflRobot/RFLROBOCODE1.java" />
     <entry file="file://$PROJECT_DIR$/src/RflRobot/TargetInfo.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -732,30 +734,36 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/RflRobot/LUT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="232">
+          <caret line="128" column="46" lean-forward="true" selection-start-line="128" selection-start-column="46" selection-end-line="128" selection-end-column="46" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/RflRobot/RLearning.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="979">
-          <caret line="61" column="26" selection-start-line="61" selection-start-column="26" selection-end-line="61" selection-end-column="26" />
+        <state relative-caret-position="257">
+          <caret line="65" column="16" selection-start-line="65" selection-start-column="16" selection-end-line="65" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/NeuralNetWork/NeurualNetWork.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="464" column="25" selection-start-line="464" selection-start-column="25" selection-end-line="464" selection-end-column="25" />
+        <state relative-caret-position="217">
+          <caret line="422" lean-forward="true" selection-start-line="422" selection-end-line="422" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/RflRobot/RFLROBOCODE.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="137" column="49" lean-forward="true" selection-start-line="137" selection-start-column="49" selection-end-line="137" selection-end-column="49" />
+        <state relative-caret-position="299">
+          <caret line="40" column="45" lean-forward="true" selection-start-line="40" selection-start-column="45" selection-end-line="40" selection-end-column="45" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#16786#16787#0" expanded="true" />
-            <element signature="e#16811#16812#0" expanded="true" />
-            <element signature="e#17091#17092#0" expanded="true" />
-            <element signature="e#17116#17117#0" expanded="true" />
           </folding>
         </state>
       </provider>

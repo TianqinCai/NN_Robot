@@ -422,8 +422,7 @@ public class NeurualNetWork implements NeuralNetInterface {
     }
 
     //save the weight as object
-    public void saveWeight() {
-        File output = new File("Weights.data");
+    public void saveWeight(File output) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(output);
             ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);

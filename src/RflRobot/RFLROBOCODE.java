@@ -7,6 +7,8 @@ import java.io.File;
 import NeuralNetWork.NeurualNetWork;
 
 import java.awt.event.KeyEvent;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,11 +46,11 @@ public class RFLROBOCODE extends AdvancedRobot {
     // Reinforcement learning parameters
     private static final double ALPHA = 0.2;    // Fraction of difference used
     private static final double GAMMA = 0.9;    // Discount factor
-    private static final double EPSILON = 0.3;  // Probability of exploration
+    private static final double EPSILON = 0.1;  // Probability of exploration
 
     private boolean mIntermediateRewards = true;
     private boolean mTerminalRewards = true;
-	private static final int REWARD_SCALER = 50; // How much to scale the rewards by for the neural network calculation
+	private static final int REWARD_SCALER = 60; // How much to scale the rewards by for the neural network calculation
 
     private static final int ACTION_MODE_MAX_Q = 0;
     private static final int ACTION_MODE_EPSILON_GREEDY = 1;
@@ -81,8 +83,8 @@ public class RFLROBOCODE extends AdvancedRobot {
     private static final int MAX_OUTPUT_SIZE = 10000;
 
     //error logging to view the convergence tendency
-    private static double errorSum[] = new double[MAX_OUTPUT_SIZE];
-    private static double cumError[] = new double[MAX_OUTPUT_SIZE];
+    private static double selectedStateActionError[] = new double[MAX_OUTPUT_SIZE];
+    private static double selectedStateActionErrorSum[] = new double[MAX_OUTPUT_SIZE];
     private static final int errorLoggingState[] = {-1,-1,-1,-1,-1,-1};
     private static final int errorLoggingAction = 6;
 
@@ -105,7 +107,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 		mErrorFile = getDataFile("Error1.txt");
 		mWeightFile = getDataFile("weight.data");
 
-        mNeuralNet = new NeurualNetWork(NUM_INPUTS, NUM_OUTPUTS, NUM_HIDDENS, LEARNING_RATE, MOMENTUM, MIN_VAL, MAX_VAL);
+        mNeuralNet = new NeurualNetWork(NUM_INPUTS, NUM_HIDDENS, NUM_OUTPUTS, LEARNING_RATE, MOMENTUM, MIN_VAL, MAX_VAL);
 
         //determine if already have weight for neuralnet or intialize the weights for the first time
 		if(mWeightFile.length()==0) {
@@ -134,6 +136,7 @@ public class RFLROBOCODE extends AdvancedRobot {
                 //use LUT with Q-learning
                 int state = getLUTState();
                 int action = rLearning.selectAction(state);
+                state = getLUTState();
                 takeAction(action);
                 switch (mCurrentLearningPolicy) {
                     // No learning at all (baseline)
@@ -142,6 +145,7 @@ public class RFLROBOCODE extends AdvancedRobot {
                         break;
                     case Q_LEARNING:
                         rLearning.offPolicyLearn(state, action, reinforcement);
+                        break;
                 }
             }
             reinforcement = 0.0;
@@ -265,8 +269,8 @@ public class RFLROBOCODE extends AdvancedRobot {
         if(currentAction!=targetAction)
             return;
         if(mStateActionPairOccurence < MAX_OUTPUT_SIZE) {
-            errorSum[mStateActionPairOccurence +1]=mNeuralNet.outputFor(mCurrentStateSnapshot)[targetAction];
-            cumError[mStateActionPairOccurence] = errorSum[mStateActionPairOccurence +1] - errorSum[mStateActionPairOccurence];
+            selectedStateActionError[mStateActionPairOccurence +1]=mNeuralNet.outputFor(mCurrentStateSnapshot)[targetAction];
+            selectedStateActionErrorSum[mStateActionPairOccurence] = selectedStateActionError[mStateActionPairOccurence +1] - selectedStateActionError[mStateActionPairOccurence];
             mStateActionPairOccurence++;
         }
 
@@ -533,7 +537,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 	public void onWin(WinEvent event) {
 		LUT.RoundCount++;
 		LUT.WinCount++;
-		reinforcement += 20;
+		reinforcement += 60;
 		if (LUT.RoundCount % 100 == 0) {
 		    //for every 100 rounds, log win rate
             logWinRate();
@@ -542,7 +546,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 
     public void onDeath(DeathEvent event) {
 		LUT.RoundCount++;
-		reinforcement -= 20;
+		reinforcement -= 60;
 		if (LUT.RoundCount % 100 == 0) {
             //for every 100 rounds, log win rate
             logWinRate();
@@ -552,9 +556,10 @@ public class RFLROBOCODE extends AdvancedRobot {
     public void onBattleEnded(BattleEndedEvent event)
     {
         LUT.outputWinRate(mWRFile);
+        outputError(mErrorFile);
         //for NN learning, save the weight
         if(NN_ENABLED)
-            mNeuralNet.saveWeight();
+            mNeuralNet.saveWeight(mWeightFile);
         //for LUT learning, save the LUT table
         else
             LUT.outputLUTTable(mLUTFile);
@@ -649,6 +654,20 @@ public class RFLROBOCODE extends AdvancedRobot {
         qPrevNew = qPrevOld + (ALPHA * (reinforcement/REWARD_SCALER + (GAMMA * qNext) - qPrevOld));
 
         return qPrevNew;
+    }
+
+    public void outputError(File output){
+        try {
+            RobocodeFileWriter fileWriter = new RobocodeFileWriter(output);
+
+            for(int i = 0; i < selectedStateActionErrorSum.length; i++){
+                fileWriter.write(String.valueOf(selectedStateActionErrorSum[i])+" " +"\n");
+            }
+            fileWriter.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void onKeyPressed(KeyEvent e) {
