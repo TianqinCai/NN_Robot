@@ -49,7 +49,7 @@ public class RLearning {
 		LUT.LUTTable[state][action] = value;
 	}
 
-	public void offPolicyLearn(int state, double reinforcement) {
+	public void offPolicyLearn(int state, int actionTaken, double reinforcement) {
 
 		int action = getBestAction(state);
 		double qNext = getQValue(state, action);
@@ -60,7 +60,7 @@ public class RLearning {
 		setQValue(lastState, lastAction, qPrevNew);
 
 		lastState = state;
-		lastAction = action;
+		lastAction = actionTaken;
 	}
 
 	public void onPolicyLearn(int state, int action, double reinforcement) {
