@@ -131,7 +131,7 @@ public class RFLROBOCODE extends AdvancedRobot {
                 takeAction(action);
                 NNLearn();
             } else {
-                //use LUT
+                //use LUT with Q-learning
                 int state = getLUTState();
                 int action = rLearning.selectAction(state);
                 takeAction(action);
@@ -291,6 +291,7 @@ public class RFLROBOCODE extends AdvancedRobot {
 
 
     private void takeAction(int action) {
+	    mCurrentAction = action;
         switch (action) {
             case LUT.GoAhead:
                 setAhead(LUT.OneStepDistance);
@@ -334,6 +335,7 @@ public class RFLROBOCODE extends AdvancedRobot {
         execute();
         if (getTime() - target.ctime > 1)
             isAiming = 0;
+        mPreviousAction = mCurrentAction;
     }
 
     private int getLUTState() {
@@ -608,15 +610,13 @@ public class RFLROBOCODE extends AdvancedRobot {
                 randomDouble = random.nextDouble();
                 if (randomDouble < EPSILON)
                 {
-                    // Take random action
+                    // Take exploration move
                     selectedAction = getRandomInt(0, ACTION_DIMENSIONALITY - 1);
                 }
-                else
-                {
-                    // Take greedy action so do nothing here
-                }
                 break;
-            // We should already have max Q from above, so choose that
+            case ACTION_MODE_MAX_Q:
+                // We should already have max Q from above, so choose that
+                break;
             default:
                 // We should never be here
                 break;
